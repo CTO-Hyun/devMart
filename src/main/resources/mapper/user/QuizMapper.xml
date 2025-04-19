@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quiz.quizify.mapper.QuizMapper">
+
+    <!-- 퀴즈 목록 조회 -->
+    <select id="findQuizList" resultType="java.util.HashMap">
+        SELECT QUIZ_ID
+                   , TITLE
+            , DESCRIPTION
+            , CREATED_BY
+                   , CREATE_DATE
+                   , CATEGORY
+                   , UPDATE_DATE
+                   , DIFFICULTY
+                   , IS_PUBLIC
+                   , TIME_LIMIT
+                   , STATUS
+        FROM TB_QUIZ
+        ORDER BY CREATE_DATE DESC
+    </select>
+
+    <!-- 퀴즈 생성 -->
+    <insert id="insertQuiz" parameterType="map" useGeneratedKeys="true" keyProperty="QUIZ_ID">
+        INSERT INTO TB_QUIZ (
+            TITLE,
+            DESCRIPTION,
+            CREATED_BY,
+            CATEGORY,
+            DIFFICULTY,
+            TIME_LIMIT,
+            IS_PUBLIC,
+            CREATE_DATE,
+            UPDATE_DATE,
+            STATUS
+        ) VALUES (
+                     #{title},
+                     #{description},
+                     #{createdBy},
+                     #{category},
+                     #{difficulty},
+                     #{timeLimit},
+                     #{isPublic},
+                     NOW(),
+                     NOW(),
+                     'ACTIVE'
+                 )
+    </insert>
+
+    <!-- 문제 생성 -->
+    <insert id="insertQuestion" parameterType="map">
+        INSERT INTO TB_QUESTION (
+            QUIZ_ID,
+            QUESTION_TEXT,
+            ANSWER,
+            CREATE_DATE,
+            UPDATE_DATE
+        ) VALUES (
+                     #{quizId},
+                     #{questionText},
+                     #{answer},
+                     NOW(),
+                     NOW()
+                 )
+    </insert>
+
+</mapper>

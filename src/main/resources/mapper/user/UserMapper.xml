@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.quiz.quizify.mapper.UserMapper">
+    <select id="findAll" resultType="java.util.HashMap">
+        SELECT ID
+            , USER_NAME
+            , EMAIL
+            , STATUS
+            , CREATE_DATE
+            , UPDATE_DATE
+        FROM TB_USER
+        ORDER BY CREATE_DATE DESC
+    </select>
+
+    <select id="findUsersByFilters" resultType="java.util.HashMap">
+        SELECT ID
+            , USER_NAME
+            , EMAIL
+            , STATUS
+            , CREATE_DATE
+            , UPDATE_DATE
+        FROM TB_USER
+        WHERE 1=1
+        <if test="userName != null and userName != '' ">
+            AND USER_NAME = #{userName}
+        </if>
+        <if test="email != null and email != '' ">
+            AND EMAIL = #{email}
+        </if>
+        <if test="status != null and email !='' ">
+            AND STATUS =#{status}
+        </if>
+        ORDER BY CREATE_DATE DESC
+    </select>
+
+    <insert id="insertUser">
+        INSERT INTO TB_USER(
+            USER_NAME
+            , EMAIL
+            , PASSWORD
+            , STATUS
+            , CREATE_DATE
+        ) VALUES (
+            #{userName}
+            , #{email}
+            , #{password}
+            , #{status}
+            , NOW()
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE TB_USER
+            SET USER_NAME = #{userName}
+                , EMAIL = #{email}
+                , PASSWORD = #{password}
+                , STATUS = #{status}
+                , UPDATE_DATE = NOW()
+        WHERE ID = #{id}
+    </update>
+
+    <delete id="deleteUser">
+        DELETE FROM TB_USER
+        WHERE ID = #{id}
+    </delete>
+</mapper>
