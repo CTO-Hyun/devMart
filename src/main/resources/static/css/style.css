@@ -104,8 +104,8 @@ form.navbar-form button {
 .cart-icon {
     background-color: #40bea7;
     color:#fff;
-    padding: 10px 15px;
-    width: 40px;
+    padding: 0px 10px;
+    /*width: 40px;*/
     float: left;
 }
 .cart-icon a {

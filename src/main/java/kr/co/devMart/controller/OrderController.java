@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/order")
@@ -37,45 +38,75 @@ public class OrderController {
         return orderService.getOrderDetail(params);
     }
 
-    /**
-     * 주문 생성
-     */
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public int createOrder(@RequestBody Map<String, Object> params) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        params.put("userId", auth.getName());
-        return orderService.createOrder(params);
+    @PostMapping("/create")
+    @ResponseBody
+    public Map<String, Object> createOrder(@RequestBody Map<String, Object> params) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            params.put("userId", auth.getName());
+            int result = orderService.createOrder(params);
+            res.put("success", result > 0);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+        }
+        return res;
     }
 
-    /**
-     * 주문상품 추가
-     */
-    @RequestMapping(value = "/addItem", method = RequestMethod.POST)
-    public int addOrderItem(@RequestBody Map<String, Object> params) {
-        return orderService.addOrderItem(params);
+    @PostMapping("/addItem")
+    @ResponseBody
+    public Map<String, Object> addOrderItem(@RequestBody Map<String, Object> params) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            int result = orderService.addOrderItem(params);
+            res.put("success", result > 0);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+        }
+        return res;
     }
 
-    /**
-     * 주문 취소
-     */
-    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public int cancelOrder(@RequestBody Map<String, Object> params) {
-        return orderService.updateOrderStatus(params);
+    @PostMapping("/cancel")
+    @ResponseBody
+    public Map<String, Object> cancelOrder(@RequestBody Map<String, Object> params) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            int result = orderService.updateOrderStatus(params);
+            res.put("success", result > 0);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+        }
+        return res;
     }
 
-    /**
-     * 주문 상태 수정
-     */
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public int updateOrderStatus(@RequestBody Map<String, Object> params) {
-        return orderService.updateOrderStatus(params);
+    @PostMapping("/update")
+    @ResponseBody
+    public Map<String, Object> updateOrderStatus(@RequestBody Map<String, Object> params) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            int result = orderService.updateOrderStatus(params);
+            res.put("success", result > 0);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+        }
+        return res;
     }
 
-    /**
-     * 주문 삭제
-     */
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public int deleteOrder(@RequestBody Map<String, Object> params) {
-        return orderService.deleteOrder(params);
+    @PostMapping("/delete")
+    @ResponseBody
+    public Map<String, Object> deleteOrder(@RequestBody Map<String, Object> params) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            int result = orderService.deleteOrder(params);
+            res.put("success", result > 0);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+        }
+        return res;
     }
 }

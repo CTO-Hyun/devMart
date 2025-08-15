@@ -50,10 +50,10 @@
                 <div class="col-md-4 col-sm-4" style="display:table-cell; vertical-align:middle; float:none; text-align:center;">
                     <div class="cart">
                         <div class="cart-icon">
-                            <a th:href="@{/cart.html}" class="btn btn-link" style="padding:0; margin:0 auto; display:block;"><i class="fa fa-shopping-cart"></i></a>
+                            <a th:href="@{/cart.html}" class="btn btn-link" style="font-size: 30px;padding:0;margin: 0px auto;display:block;"><i class="fa fa-shopping-cart"></i></a>
                         </div>
                         <div class="cart-text" style="margin-top:2px; text-align:center;">
-                            장바구니<br><span id="cart-count">0 건 - 0원</span>
+                            장바구니<br><span id="cart-count" th:utext="${cartCount} + ' 건 - ' + ${#numbers.formatInteger(cartTotal, 0, 'COMMA')} + '원'"></span>
                         </div>
                     </div>
                 </div>

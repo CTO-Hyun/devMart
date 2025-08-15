@@ -2,20 +2,45 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.devMart.mapper.CartMapper">
     <select id="selectCartListByUser" parameterType="map" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_CART WHERE USER_ID = #{userId}
+        SELECT
+            c.ID AS cartId,
+            c.USER_ID,
+            c.PRODUCT_ID,
+            c.QUANTITY,
+            p.NAME AS productName,
+            p.PRICE,
+            p.IMAGE_URL
+        FROM TB_CART c
+        INNER JOIN TB_PRODUCT p 
+            ON c.PRODUCT_ID = p.ID
+        WHERE c.USER_ID = #{userId}
     </select>
+
     <insert id="insertCart" parameterType="map">
-        INSERT INTO TB_CART (USER_ID, PRODUCT_ID, QUANTITY, CREATE_DATE)
-        VALUES (#{userId}, #{productId}, #{quantity}, NOW())
+        INSERT INTO TB_CART ( USER_ID
+                            , PRODUCT_ID
+                            , QUANTITY
+                            , CREATE_DATE)
+        VALUES ( #{userId}
+               , #{productId}
+               , #{quantity}
+               , NOW())
     </insert>
+
     <update id="updateCartQuantity" parameterType="map">
-        UPDATE TB_CART SET QUANTITY = #{quantity}, UPDATE_DATE = NOW()
+        UPDATE TB_CART
+        SET QUANTITY    = #{quantity},
+            UPDATE_DATE = NOW()
         WHERE ID = #{id}
     </update>
+
     <delete id="deleteCart" parameterType="map">
-        DELETE FROM TB_CART WHERE ID = #{id}
+        DELETE FROM TB_CART
+        WHERE ID = #{id}
     </delete>
+
     <delete id="deleteCartByUser" parameterType="map">
-        DELETE FROM TB_CART WHERE USER_ID = #{userId}
+        DELETE FROM TB_CART
+        WHERE USER_ID = #{userId}
     </delete>
 </mapper>

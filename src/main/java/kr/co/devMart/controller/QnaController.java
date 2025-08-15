@@ -31,23 +31,32 @@ public class QnaController {
         return qnaService.getQnaListByProduct(params);
     }
 
-    // 문의 등록
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public int addQna(@RequestBody Map<String, Object> params) {
+    @PostMapping("/create")
+    @ResponseBody
+    public Map<String, Object> addQna(@RequestParam Map<String, Object> params) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        params.put("username", auth.getName());
-        return qnaService.addQna(params);
+        params.put("userName", auth.getName());
+        int result = qnaService.addQna(params);
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", result > 0);
+        return res;
     }
 
-    // 문의 수정
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public int updateQna(@RequestBody Map<String, Object> params) {
-        return qnaService.updateQna(params);
+    @PostMapping("/update")
+    @ResponseBody
+    public Map<String, Object> updateQna(@RequestParam Map<String, Object> params) {
+        int result = qnaService.updateQna(params);
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", result > 0);
+        return res;
     }
 
-    // 문의(Q&A) 삭제
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public int deleteQna(@RequestBody Map<String, Object> params) {
-        return qnaService.deleteQna(params);
+    @PostMapping("/delete")
+    @ResponseBody
+    public Map<String, Object> deleteQna(@RequestParam Map<String, Object> params) {
+        int result = qnaService.deleteQna(params);
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", result > 0);
+        return res;
     }
 }

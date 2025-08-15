@@ -43,11 +43,15 @@ public class ReviewController {
     }
 
     // 리뷰 등록
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public int addReview(@RequestBody Map<String, Object> params) {
+    @PostMapping("/create")
+    @ResponseBody
+    public Map<String, Object> addReview(@RequestParam Map<String, Object> params) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         params.put("userName", auth.getName());
-        return reviewService.addReview(params);
+        int result = reviewService.addReview(params);
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", result > 0);
+        return res;
     }
 
     // 리뷰 수정

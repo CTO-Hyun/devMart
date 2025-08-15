@@ -16,10 +16,10 @@ spring:
     encoding: UTF-8
     fallback-to-system-locale: true
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:mysql://localhost:3306/devmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: root
     password: root1234
-    url: jdbc:mysql://localhost:3306/devmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     hikari:
       connection-timeout: 3000
       validation-timeout: 1000
@@ -82,3 +82,9 @@ logging:
     org.mybatis: DEBUG
     org.springframework.jdbc: DEBUG
     org.springframework.transaction: DEBUG
+    jdbc.sqlonly: INFO
+    jdbc.sqltiming: INFO
+    jdbc.audit: OFF
+    jdbc.resultset: OFF
+    jdbc.resultsettable: INFO
+    jdbc.connection: OFF

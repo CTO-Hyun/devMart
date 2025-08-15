@@ -4,9 +4,12 @@ import kr.co.devMart.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -32,22 +35,49 @@ public class CartController {
         return cartService.getCartListByUser(params);
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public int addCart(@RequestBody Map<String, Object> params) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        params.put("userId", auth.getName());
-        return cartService.addCart(params);
+    @PostMapping("/add")
+    @ResponseBody
+    public Map<String, Object> addCart(@RequestBody Map<String, Object> params) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            params.put("userId", auth.getName());
+            int result = cartService.addCart(params);
+            res.put("success", result > 0);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+        }
+        return res;
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public int updateCartQuantity(@RequestBody Map<String, Object> params) {
-        return cartService.updateCartQuantity(params);
+    @PostMapping("/update")
+    @ResponseBody
+    public Map<String, Object> updateCartQuantity(@RequestBody Map<String, Object> params) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            int result = cartService.updateCartQuantity(params);
+            res.put("success", result > 0);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+        }
+        return res;
     }
 
     // 장바구니 항목 삭제
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public int deleteCart(@RequestBody Map<String, Object> params) {
-        return cartService.deleteCart(params);
+    @PostMapping("/delete")
+    @ResponseBody
+    public Map<String, Object> deleteCart(@RequestBody Map<String, Object> params) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            int result = cartService.deleteCart(params);
+            res.put("success", result > 0);
+        } catch (Exception e) {
+            res.put("success", false);
+            res.put("message", e.getMessage());
+        }
+        return res;
     }
 
     @RequestMapping(value = "/clear", method = RequestMethod.POST)

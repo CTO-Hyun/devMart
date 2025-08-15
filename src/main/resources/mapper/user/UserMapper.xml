@@ -29,25 +29,12 @@
             OFFSET #{offset}
         </if>
     </select>
+
     <!-- 사용자 상세 조회 (로그인/회원가입) -->
     <select id="selectUserByUsername" parameterType="string" resultType="kr.co.devMart.common.util.CamelMap">
         SELECT * FROM TB_USER WHERE USERNAME = #{username}
     </select>
-    <!-- 사용자 등록 (회원가입) -->
-    <insert id="insertUser" parameterType="map">
-        INSERT INTO TB_USER (USERNAME, PASSWORD, EMAIL, ROLE, STATUS)
-        VALUES (#{username}, #{password}, #{email}, 'USER', 'ACTIVE')
-    </insert>
-    <!-- 사용자 수정 -->
-    <update id="updateUser" parameterType="map">
-        UPDATE TB_USER
-        SET EMAIL = #{email}, ROLE = #{role}, STATUS = #{status}, UPDATE_DATE = NOW()
-        WHERE USERNAME = #{username}
-    </update>
-    <!-- 사용자 삭제 -->
-    <delete id="deleteUser" parameterType="map">
-        DELETE FROM TB_USER WHERE USERNAME = #{username}
-    </delete>
+
     <!-- 사용자 개수 조회 -->
     <select id="selectUserCount" resultType="int">
         SELECT COUNT(*) FROM TB_USER
@@ -66,4 +53,32 @@
             </if>
         </where>
     </select>
+
+    <!-- 사용자 등록 (회원가입) -->
+    <insert id="insertUser" parameterType="map">
+        INSERT INTO TB_USER ( USERNAME
+                            , PASSWORD
+                            , EMAIL
+                            , ROLE, STATUS)
+        VALUES ( #{username}
+               , #{password}
+               , #{email}
+               , 'USER'
+               , 'ACTIVE')
+    </insert>
+
+    <!-- 사용자 수정 -->
+    <update id="updateUser" parameterType="map">
+        UPDATE TB_USER
+        SET EMAIL       = #{email},
+            ROLE        = #{role},
+            STATUS      = #{status},
+            UPDATE_DATE = NOW()
+        WHERE USERNAME = #{username}
+    </update>
+
+    <!-- 사용자 삭제 -->
+    <delete id="deleteUser" parameterType="map">
+        DELETE FROM TB_USER WHERE USERNAME = #{username}
+    </delete>
 </mapper>
