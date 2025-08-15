@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.devMart.mapper.UserMapper">
+    <!-- 사용자 목록 조회 -->
+    <select id="selectUserList" resultType="kr.co.devMart.common.util.CamelMap">
+        SELECT ID, USERNAME, EMAIL, ROLE, STATUS, CREATE_DATE, UPDATE_DATE
+        FROM TB_USER
+        <where>
+            <if test="username != null and username != ''">
+                AND USERNAME LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND EMAIL LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="role != null and role != ''">
+                AND ROLE = #{role}
+            </if>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+            </if>
+        </where>
+        ORDER BY CREATE_DATE DESC
+        <if test="limit != null and limit > 0">
+            LIMIT #{limit}
+        </if>
+        <if test="offset != null and offset > 0">
+            OFFSET #{offset}
+        </if>
+    </select>
+    <!-- 사용자 상세 조회 (로그인/회원가입) -->
+    <select id="selectUserByUsername" parameterType="string" resultType="kr.co.devMart.common.util.CamelMap">
+        SELECT * FROM TB_USER WHERE USERNAME = #{username}
+    </select>
+    <!-- 사용자 등록 (회원가입) -->
+    <insert id="insertUser" parameterType="map">
+        INSERT INTO TB_USER (USERNAME, PASSWORD, EMAIL, ROLE, STATUS)
+        VALUES (#{username}, #{password}, #{email}, 'USER', 'ACTIVE')
+    </insert>
+    <!-- 사용자 수정 -->
+    <update id="updateUser" parameterType="map">
+        UPDATE TB_USER
+        SET EMAIL = #{email}, ROLE = #{role}, STATUS = #{status}, UPDATE_DATE = NOW()
+        WHERE USERNAME = #{username}
+    </update>
+    <!-- 사용자 삭제 -->
+    <delete id="deleteUser" parameterType="map">
+        DELETE FROM TB_USER WHERE USERNAME = #{username}
+    </delete>
+    <!-- 사용자 개수 조회 -->
+    <select id="selectUserCount" resultType="int">
+        SELECT COUNT(*) FROM TB_USER
+        <where>
+            <if test="username != null and username != ''">
+                AND USERNAME LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND EMAIL LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="role != null and role != ''">
+                AND ROLE = #{role}
+            </if>
+            <if test="status != null and status != ''">
+                AND STATUS = #{status}
+            </if>
+        </where>
+    </select>
+</mapper>

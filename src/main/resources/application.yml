@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: DEVMART
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: -1
+      max-request-size: -1
+  messages:
+    basename: i18n/message
+    encoding: UTF-8
+    fallback-to-system-locale: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root1234
+    url: jdbc:mysql://localhost:3306/devmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    hikari:
+      connection-timeout: 3000
+      validation-timeout: 1000
+      max-lifetime: 50000
+      idle-timeout: 50000
+      keepalive-time: 30000
+      maximum-pool-size: 1
+  web:
+    resources:
+      chain:
+        enabled: true
+        cache: true
+  thymeleaf:
+    cache: false
+  data:
+    web:
+      pageable:
+        default-page-size: 30
+        max-page-size: 500
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+mybatis:
+  mapper-locations: classpath*:mapper/**/**/*.xml
+  type-aliases-package: kr.co.devMart.**.vo, kr.co.devMart.cmn.util
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    use-generated-keys: true
+    default-executor-type: reuse
+    call-setters-on-nulls: true
+
+server:
+  port: 8080
+
+#FILE
+file:
+  host: http://localhost:8080
+  path: /Users/nis/dev/devMart-main/data
+  url: /images/
+
+app:
+  fcm:
+    path: /Users/nis/dev/devMart-main/data/fcm
+  group: DEVMART
+  file:
+    path: /Users/nis/dev/devMart-main/data
+
+api:
+  inout:
+    host: http://localhost:8080
+
+logging:
+  level:
+    kr.co.devMart.mapper: DEBUG
+    org.mybatis: DEBUG
+    org.springframework.jdbc: DEBUG
+    org.springframework.transaction: DEBUG

@@ -1,0 +1,93 @@
+<th:block xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="header">
+    <!-- 로그인 툴바-->
+    <div class="top-bar">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="social pull-left">
+                        <ul>
+                            <li><a href=""><i class="fa fa-facebook"></i></a></li>
+                            <li><a href=""><i class="fa fa-twitter"></i></a></li>
+                            <li><a href=""><i class="fa fa-google-plus"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="action pull-right">
+                        <ul>
+                            <li sec:authorize="isAnonymous()"><a th:href="@{/login}" class="btn btn-link"><i class="fa fa-user"></i> 로그인</a></li>
+                            <li sec:authorize="isAnonymous()"><a th:href="@{/signup}" class="btn btn-link"><i class="fa fa-user-plus"></i> 회원가입</a></li>
+                            <li sec:authorize="isAuthenticated()"><a th:href="@{/mypage.html}" class="btn btn-link"><i class="fa fa-user"></i> 마이페이지</a></li>
+                            <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}" class="btn btn-link"><i class="fa fa-sign-out"></i> 로그아웃</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--검색 -->
+    <div class="header">
+        <div class="container" style="display:table; width:100%; height:180px;">
+            <div class="row" style="display:table-row;">
+                <div class="col-md-4 col-sm-4" style="display:table-cell; vertical-align:middle; float:none; text-align:right;">
+                    <div class="logo" style="display:inline-block; vertical-align:middle;">
+                        <a href="/main">
+                            <img src="/images/devMart_logo.png" alt="devMart" style="max-width:150px; height:auto; vertical-align:middle;">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4" style="display:table-cell; vertical-align:middle; float:none; text-align:center;">
+                    <div class="search-form" style="margin:0 auto; width:80%; display:inline-block; vertical-align:middle;">
+                        <form class="navbar-form" role="search" style="margin:0 auto; width:100%; display:flex; align-items:center;">
+                            <div class="form-group" style="flex:1; margin-bottom:0;">
+                                <input type="text" class="form-control" placeholder="검색어를 입력해 주세요." style="width:100%; min-width:180px;">
+                            </div>
+                            <button type="submit" class="btn" style="margin-left:10px; vertical-align:middle;"><i class="fa fa-search"></i></button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-4" style="display:table-cell; vertical-align:middle; float:none; text-align:center;">
+                    <div class="cart">
+                        <div class="cart-icon">
+                            <a th:href="@{/cart.html}" class="btn btn-link" style="padding:0; margin:0 auto; display:block;"><i class="fa fa-shopping-cart"></i></a>
+                        </div>
+                        <div class="cart-text" style="margin-top:2px; text-align:center;">
+                            장바구니<br><span id="cart-count">0 건 - 0원</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--카테고리-->
+    <div class="navigation">
+        <nav class="navbar-theme">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                            aria-expanded="false">
+                        <span class="sr-only">Menu</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" id="navbar">
+                    <ul class="nav" style="margin-right: -15px; display: flex; justify-content: space-around;">
+                        <li><a href="/product/list">All</a></li>
+                        <li><a href="/product/list?categoryType=MEN">Men</a></li>
+                        <li><a href="/product/list?categoryType=WOMEN">Women</a></li>
+                        <li><a href="/product/list?categoryType=KIDS">Kids</a></li>
+                        <li><a href="/product/list?categoryType=SHOES">Shoes</a></li>
+                        <li><a href="/product/list?categoryType=ACC">Acc</a></li>
+                        <li><a href="/product/list?categoryType=BAG">Bag</a></li>
+                        <li><a href="/product/list?categoryType=ETC">Etc</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+</th:block>
+

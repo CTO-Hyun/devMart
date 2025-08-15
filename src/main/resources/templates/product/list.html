@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout/default}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>devMart</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<section class="content" layout:fragment="content">
+    <div class="container">
+        <h3 class="page-header">[[${params.title}]] 목록</h3>
+        <div class="row">
+            <div class="product-box" th:each="product : ${products}">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title" th:text="${product.name}"></h3>
+                    </div>
+                    <div class="panel-body text-center">
+                        <div class="product-image-wrapper">
+                            <img alt="상품 이미지"
+                                 onerror="this.src='/images/preparing.png'" th:src="@{${product.imageUrl}}"/>
+                        </div>
+
+                        <p><strong th:class="${product.price < 50000} ? 'rainbow-text' : ''"
+                                   th:text="${product.price < 0 ? '0 원' : #numbers.formatInteger(product.price, 0, 'COMMA') + ' 원'}"></strong>
+                        </p>
+                        <button class="btn btn-sm btn-primary" type="button">구매</button>
+                        <button class="btn btn-sm btn-info add-to-cart-btn"
+                                th:attr="data-product-id=${product.id},data-product-name=${product.name},data-price=${product.price}"
+                                type="button">
+                            <i aria-hidden="true"
+                               class="fa fa-shopping-cart"
+                               style="font-size: 1.7em; line-height: 0.75em; vertical-align: -15%;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        // 페이지 로드 시 장바구니 정보 갱신
+        $(function () {
+            loadCart();
+        });
+
+        // 장바구니 담기 버튼 클릭 시 AJAX로 백엔드 호출
+        $(document).on('click', '.add-to-cart-btn', function () {
+            var productId = $(this).data('product-id');
+            var productName = $(this).data('product-name');
+            var price = $(this).data('price');
+            $.ajax({
+                url: '/cart/add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({productId: productId, productName: productName, price: price, quantity: 1}),
+                success: function () {
+                    if (confirm('장바구니에 담았습니다. 장바구니로 이동하시겠습니까? (취소: 계속 쇼핑)')) {
+                        window.location.href = '/cart.html';
+                    }
+                },
+                error: function () {
+                    alert('장바구니 담기 실패');
+                }
+            });
+        });
+
+        // 장바구니 개수/금액 요약 정보 갱신
+        function updateCartSummary() {
+            $.ajax({
+                url: '/cart/list',
+                type: 'GET',
+                success: function (cartList) {
+                    var totalCount = 0;
+                    var totalPrice = 0;
+                    for (var i = 0; i < cartList.length; i++) {
+                        totalCount += cartList[i].quantity;
+                        totalPrice += (cartList[i].quantity * cartList[i].price || 0);
+                    }
+                    $(".cart-text").html('장바구니<br>' + totalCount + ' 건 - ' + totalPrice.toLocaleString() + '원');
+                },
+                error: function () {
+                    $(".cart-text").html('장바구니<br>0 건 - 0원');
+                }
+            });
+        }
+    </script>
+</section>
+
+</body>
+</html>

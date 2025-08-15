@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 | devMart</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/css/responsive.css}"/>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+<section>
+    <div class="container" style="max-width:1100px;margin:60px auto;">
+        <h2 style="text-align:center; margin-bottom:30px;">관리자 페이지</h2>
+        <ul class="nav nav-tabs" id="admin-tabs">
+            <li class="active"><a data-toggle="tab" href="#products">상품관리</a></li>
+            <li><a data-toggle="tab" href="#users">회원관리</a></li>
+            <li><a data-toggle="tab" href="#orders">주문관리</a></li>
+            <li><a data-toggle="tab" href="#payments">결제관리</a></li>
+            <li><a data-toggle="tab" href="#reviews">리뷰관리</a></li>
+            <li><a data-toggle="tab" href="#qna">문의관리</a></li>
+        </ul>
+        <div class="tab-content" style="margin-top:20px;">
+            <div class="tab-pane fade in active" id="products">
+                <h4>상품관리</h4>
+                <div id="admin-products"></div>
+            </div>
+            <div class="tab-pane fade" id="users">
+                <h4>회원관리</h4>
+                <div id="admin-users"></div>
+            </div>
+            <div class="tab-pane fade" id="orders">
+                <h4>주문관리</h4>
+                <div id="admin-orders"></div>
+            </div>
+            <div class="tab-pane fade" id="payments">
+                <h4>결제관리</h4>
+                <div id="admin-payments"></div>
+            </div>
+            <div class="tab-pane fade" id="reviews">
+                <h4>리뷰관리</h4>
+                <div id="admin-reviews"></div>
+            </div>
+            <div class="tab-pane fade" id="qna">
+                <h4>문의관리</h4>
+                <div id="admin-qna"></div>
+            </div>
+        </div>
+    </div>
+
+    <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script crossorigin="anonymous"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+    <script>
+          $(function () {
+            loadAdminProducts();
+        });
+
+        function loadAdminProducts() {
+            $.get('/admin/products', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var p = list[i];
+                    html += '<li>' + (p.productName || '') + ' / ' + (p.price ? p.price.toLocaleString() : 0) + '원 / 재고: ' + (p.stock || 0) +
+                        ' <button class="btn btn-xs btn-info admin-product-detail" data-id="' + p.id + '">상세</button>' +
+                        ' <button class="btn btn-xs btn-warning admin-product-edit" data-id="' + p.id + '" data-name="' + (p.productName || '') + '" data-price="' + (p.price || 0) + '" data-stock="' + (p.stock || 0) + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-product-del" data-id="' + p.id + '">삭제</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-products').html(html);
+            });
+        }
+
+        $('#admin-products').before('<div id="product-form"><input type="text" id="product-name" placeholder="상품명"><input type="number" id="product-price" placeholder="가격"><input type="number" id="product-stock" placeholder="재고"><button id="product-create" class="btn btn-sm btn-success">상품 등록</button></div>');
+        $('#product-create').click(function () {
+            var name = $('#product-name').val();
+            var price = $('#product-price').val();
+            var stock = $('#product-stock').val();
+            $.ajax({
+                url: '/admin/products/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({name: name, price: price, stock: stock}),
+                success: function () {
+                    loadAdminProducts();
+                    $('#product-name').val('');
+                    $('#product-price').val('');
+                    $('#product-stock').val('');
+                }
+            });
+        });
+
+        $(document).on('click', '.admin-product-edit', function () {
+            var id = $(this).data('id');
+            var name = prompt('상품명 수정', $(this).data('name'));
+            var price = prompt('가격 수정', $(this).data('price'));
+            var stock = prompt('재고 수정', $(this).data('stock'));
+            if (name && price && stock) {
+                $.ajax({
+                    url: '/admin/products/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, name: name, price: price, stock: stock}),
+                    success: loadAdminProducts
+                });
+            }
+        });
+
+        $(document).on('click', '.admin-product-del', function () {
+            var id = $(this).data('id');
+            if (confirm('상품을 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/admin/products/delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id}),
+                    success: loadAdminProducts
+                });
+            }
+        });
+
+        // 상품 상세보기 버튼 및 기능
+        $(document).on('click', '.admin-product-detail', function () {
+            var id = $(this).data('id');
+            $.get('/admin/products/detail', {id: id}, function (p) {
+                alert('상품명: ' + (p.productName || '') + '\n가격: ' + (p.price || 0) + '\n재고: ' + (p.stock || 0));
+            });
+        });
+
+        // 상품 검색 기능
+        $('#admin-products').before('<div id="product-search"><input type="text" id="product-keyword" placeholder="상품명 검색"><button id="product-search-btn" class="btn btn-sm btn-default">검색</button></div>');
+        $('#product-search-btn').click(function () {
+            var keyword = $('#product-keyword').val();
+            $.get('/admin/products', {keyword: keyword}, function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var p = list[i];
+                    html += '<li>' + (p.productName || '') + ' / ' + (p.price ? p.price.toLocaleString() : 0) + '원 / 재고: ' + (p.stock || 0) +
+                        ' <button class="btn btn-xs btn-info admin-product-detail" data-id="' + p.id + '">상세</button>' +
+                        ' <button class="btn btn-xs btn-warning admin-product-edit" data-id="' + p.id + '" data-name="' + (p.productName || '') + '" data-price="' + (p.price || 0) + '" data-stock="' + (p.stock || 0) + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-product-del" data-id="' + p.id + '">삭제</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-products').html(html);
+            });
+        });
+
+        // 회원 등록/수정 폼 및 기능
+        $('#admin-users').before('<div id="user-form"><input type="text" id="user-username" placeholder="아이디"><input type="text" id="user-name" placeholder="이름"><input type="text" id="user-email" placeholder="이메일"><button id="user-create" class="btn btn-sm btn-success">회원 등록</button></div>');
+        $('#user-create').click(function () {
+            var username = $('#user-username').val();
+            var name = $('#user-name').val();
+            var email = $('#user-email').val();
+            $.ajax({
+                url: '/admin/users/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({username: username, name: name, email: email}),
+                success: function () {
+                    loadAdminUsers();
+                    $('#user-username').val('');
+                    $('#user-name').val('');
+                    $('#user-email').val('');
+                }
+            });
+        });
+
+        $(document).on('click', '.admin-user-edit', function () {
+            var id = $(this).data('id');
+            var name = prompt('이름 수정', $(this).data('name'));
+            var email = prompt('이메일 수정', $(this).data('email'));
+            if (name && email) {
+                $.ajax({
+                    url: '/admin/users/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, name: name, email: email}),
+                    success: loadAdminUsers
+                });
+            }
+        });
+
+        // 회원 목록에 수정 버튼 추가
+        function loadAdminUsers() {
+            $.get('/admin/users', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var u = list[i];
+                    html += '<li>' + (u.userId || '') + ' / ' + (u.name || '') + ' / ' + (u.email || '') +
+                        ' <button class="btn btn-xs btn-warning admin-user-edit" data-id="' + u.id + '" data-name="' + (u.name || '') + '" data-email="' + (u.email || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-user-del" data-id="' + u.id + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-user-detail" data-id="' + u.id + '">상세</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-users').html(html);
+            });
+        }
+
+        $(document).on('click', '.admin-user-del', function () {
+            var id = $(this).data('id');
+            if (confirm('회원을 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/admin/users/delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id}),
+                    success: loadAdminUsers
+                });
+            }
+        });
+
+        // 회원 상세보기 버튼 및 기능
+        $(document).on('click', '.admin-user-detail', function () {
+            var id = $(this).data('id');
+            $.get('/admin/users/detail', {id: id}, function (u) {
+                alert('아이디: ' + (u.userId || '') + '\n이름: ' + (u.name || '') + '\n이메일: ' + (u.email || ''));
+            });
+        });
+
+        // 주문관리 수정 버튼
+        function loadAdminOrders() {
+            $.get('/admin/orders', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var o = list[i];
+                    html += '<li>주문번호: ' + (o.id || '') + ', 금액: ' + (o.totalPrice ? o.totalPrice.toLocaleString() : 0) + '원, 상태: ' + (o.status || '') +
+                        ' <button class="btn btn-xs btn-warning admin-order-edit" data-id="' + o.id + '" data-status="' + (o.status || '') + '">상태수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-order-del" data-id="' + o.id + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-order-detail" data-id="' + o.id + '">상세</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-orders').html(html);
+            });
+        }
+
+        // 주문 등록 폼 및 기능
+        $('#admin-orders').before('<div id="order-form"><input type="text" id="order-user-id" placeholder="회원아이디"><input type="number" id="order-total-price" placeholder="총금액"><input type="text" id="order-status" placeholder="상태"><button id="order-create" class="btn btn-sm btn-success">주문 등록</button></div>');
+        $('#order-create').click(function () {
+            var userId = $('#order-user-id').val();
+            var totalPrice = $('#order-total-price').val();
+            var status = $('#order-status').val();
+            $.ajax({
+                url: '/admin/orders/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({userId: userId, totalPrice: totalPrice, status: status}),
+                success: function () {
+                    loadAdminOrders();
+                    $('#order-user-id').val('');
+                    $('#order-total-price').val('');
+                    $('#order-status').val('');
+                }
+            });
+        });
+
+        $(document).on('click', '.admin-order-edit', function () {
+            var id = $(this).data('id');
+            var status = prompt('주문 상태 수정', $(this).data('status'));
+            if (status) {
+                $.ajax({
+                    url: '/admin/orders/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, status: status}),
+                    success: loadAdminOrders
+                });
+            }
+        });
+
+        // 주문 목록에 수정 버튼 추가
+        function loadAdminOrders() {
+            $.get('/admin/orders', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var o = list[i];
+                    html += '<li>주문번호: ' + (o.id || '') + ', 금액: ' + (o.totalPrice ? o.totalPrice.toLocaleString() : 0) + '원, 상태: ' + (o.status || '') +
+                        ' <button class="btn btn-xs btn-warning admin-order-edit" data-id="' + o.id + '" data-status="' + (o.status || '') + '">상태수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-order-del" data-id="' + o.id + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-order-detail" data-id="' + o.id + '">상세</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-orders').html(html);
+            });
+        }
+
+        // 결제관리 수정 버튼
+        function loadAdminPayments() {
+            $.get('/admin/payments', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var p = list[i];
+                    html += '<li>결제번호: ' + (p.id || '') + ', 주문번호: ' + (p.orderId || '') + ', 금액: ' + (p.amount ? p.amount.toLocaleString() : 0) + '원, 상태: ' + (p.status || '') +
+                        ' <button class="btn btn-xs btn-warning admin-payment-edit" data-id="' + p.id + '" data-status="' + (p.status || '') + '">상태수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-payment-del" data-id="' + p.id + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-payment-detail" data-id="' + p.id + '">상세</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-payments').html(html);
+            });
+        }
+
+        // 결제 등록/수정 폼 및 기능
+        $('#admin-payments').before('<div id="payment-form"><input type="number" id="payment-order-id" placeholder="주문번호"><input type="number" id="payment-amount" placeholder="금액"><input type="text" id="payment-status" placeholder="상태"><button id="payment-create" class="btn btn-sm btn-success">결제 등록</button></div>');
+        $('#payment-create').click(function () {
+            var orderId = $('#payment-order-id').val();
+            var amount = $('#payment-amount').val();
+            var status = $('#payment-status').val();
+            $.ajax({
+                url: '/admin/payments/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({orderId: orderId, amount: amount, status: status}),
+                success: function () {
+                    loadAdminPayments();
+                    $('#payment-order-id').val('');
+                    $('#payment-amount').val('');
+                    $('#payment-status').val('');
+                }
+            });
+        });
+
+        $(document).on('click', '.admin-payment-edit', function () {
+            var id = $(this).data('id');
+            var status = prompt('결제 상태 수정', $(this).data('status'));
+            if (status) {
+                $.ajax({
+                    url: '/admin/payments/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, status: status}),
+                    success: loadAdminPayments
+                });
+            }
+        });
+
+        // 리뷰관리 수정 버튼
+        function loadAdminReviews() {
+            $.get('/admin/reviews', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var r = list[i];
+                    html += '<li>' + (r.productName || '') + ' / ' + (r.rating || '') + '점 / ' + (r.content || '') +
+                        ' <button class="btn btn-xs btn-warning admin-review-edit" data-id="' + r.id + '" data-rating="' + (r.rating || '') + '" data-content="' + (r.content || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-review-del" data-id="' + r.id + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-review-detail" data-id="' + r.id + '">상세</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-reviews').html(html);
+            });
+        }
+
+        // 리뷰 등록/수정 폼 및 기능
+        $('#admin-reviews').before('<div id="review-form"><input type="text" id="review-product-name" placeholder="상품명"><input type="number" id="review-rating" min="1" max="5" placeholder="별점(1~5)"><input type="text" id="review-content" placeholder="리뷰 내용"><button id="review-create" class="btn btn-sm btn-success">리뷰 등록</button></div>');
+        $('#review-create').click(function () {
+            var productName = $('#review-product-name').val();
+            var rating = $('#review-rating').val();
+            var content = $('#review-content').val();
+            $.ajax({
+                url: '/admin/reviews/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({productName: productName, rating: rating, content: content}),
+                success: function () {
+                    loadAdminReviews();
+                    $('#review-product-name').val('');
+                    $('#review-rating').val('');
+                    $('#review-content').val('');
+                }
+            });
+        });
+
+        $(document).on('click', '.admin-review-edit', function () {
+            var id = $(this).data('id');
+            var rating = prompt('별점 수정(1~5)', $(this).data('rating'));
+            var content = prompt('리뷰 내용 수정', $(this).data('content'));
+            if (rating && content) {
+                $.ajax({
+                    url: '/admin/reviews/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, rating: rating, content: content}),
+                    success: loadAdminReviews
+                });
+            }
+        });
+
+        function loadAdminQna() {
+            $.get('/admin/qna', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var q = list[i];
+                    html += '<li>' + (q.productName || '') + ' / ' + (q.question || '') + ' / 답변: ' + (q.answer || '-') +
+                        ' <button class="btn btn-xs btn-warning admin-qna-edit" data-id="' + q.id + '" data-question="' + (q.question || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-success qna-answer" data-id="' + q.id + '" data-answer="' + (q.answer || '') + '">답변등록/수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-qna-del" data-id="' + q.id + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-qna-detail" data-id="' + q.id + '">상세</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-qna').html(html);
+            });
+        }
+
+        $(document).on('click', '.qna-answer', function () {
+            var id = $(this).data('id');
+            var answer = prompt('답변 입력/수정', $(this).data('answer'));
+            if (answer !== null) {
+                $.ajax({
+                    url: '/qna/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, answer: answer}),
+                    success: loadAdminQna
+                });
+            }
+        });
+
+        // 문의 등록 폼 및 기능
+        $('#admin-qna').before('<div id="qna-form"><input type="text" id="qna-product-name" placeholder="상품명"><input type="text" id="qna-question" placeholder="문의 내용"><button id="qna-create" class="btn btn-sm btn-success">문의 등록</button></div>');
+        $('#qna-create').click(function () {
+            var productName = $('#qna-product-name').val();
+            var question = $('#qna-question').val();
+            $.ajax({
+                url: '/admin/qna/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({productName: productName, question: question}),
+                success: function () {
+                    loadAdminQna();
+                    $('#qna-product-name').val('');
+                    $('#qna-question').val('');
+                }
+            });
+        });
+
+        $(document).on('click', '.admin-qna-edit', function () {
+            var id = $(this).data('id');
+            var question = prompt('문의 내용 수정', $(this).data('question'));
+            if (question) {
+                $.ajax({
+                    url: '/admin/qna/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, question: question}),
+                    success: loadAdminQna
+                });
+            }
+        });
+
+        // 문의 목록에 수정 버튼 추가
+        function loadAdminQna() {
+            $.get('/admin/qna', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var q = list[i];
+                    html += '<li>' + (q.productName || '') + ' / ' + (q.question || '') + ' / 답변: ' + (q.answer || '-') +
+                        ' <button class="btn btn-xs btn-warning admin-qna-edit" data-id="' + q.id + '" data-question="' + (q.question || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-success qna-answer" data-id="' + q.id + '" data-answer="' + (q.answer || '') + '">답변등록/수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-qna-del" data-id="' + q.id + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-qna-detail" data-id="' + q.id + '">상세</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#admin-qna').html(html);
+            });
+        }
+
+        // 문의 상세보기 버튼 및 기능
+        $(document).on('click', '.admin-qna-detail', function () {
+            var id = $(this).data('id');
+            $.get('/admin/qna/detail', {id: id}, function (q) {
+                alert('상품명: ' + (q.productName || '') + '\n질문: ' + (q.question || '') + '\n답변: ' + (q.answer || ''));
+            });
+        });
+
+        $('#admin-tabs a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+            var id = $(this).attr('href');
+            if (id === "#products") loadAdminProducts();
+            else if (id === "#users") loadAdminUsers();
+            else if (id === "#orders") loadAdminOrders();
+            else if (id === "#payments") loadAdminPayments();
+            else if (id === "#reviews") loadAdminReviews();
+            else if (id === "#qna") loadAdminQna();
+        });
+    </script>
+</section>
+<div th:replace="layout/footer :: footer"></div>
+</body>
+</html>

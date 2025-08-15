@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지 | devMart</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/css/responsive.css}"/>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
+<body>
+<div th:replace="layout/header :: header"></div>
+<section>
+    <div class="container" style="max-width:900px;margin:60px auto;">
+        <h2 style="text-align:center; margin-bottom:30px;">마이페이지</h2>
+        <ul class="nav nav-tabs" id="mypage-tabs">
+            <li class="active"><a data-toggle="tab" href="#info">내 정보</a></li>
+            <li><a data-toggle="tab" href="#orders">주문내역</a></li>
+            <li><a data-toggle="tab" href="#cart">장바구니</a></li>
+            <li><a data-toggle="tab" href="#reviews">리뷰</a></li>
+            <li><a data-toggle="tab" href="#qna">문의</a></li>
+        </ul>
+        <div class="tab-content" style="margin-top:20px;">
+            <div class="tab-pane fade in active" id="info">
+                <h4>내 정보</h4>
+                <div id="user-info"></div>
+            </div>
+            <div class="tab-pane fade" id="orders">
+                <h4>주문내역</h4>
+                <div id="mypage-orders"></div>
+            </div>
+            <div class="tab-pane fade" id="cart">
+                <h4>장바구니</h4>
+                <div id="mypage-cart"></div>
+            </div>
+            <div class="tab-pane fade" id="reviews">
+                <h4>리뷰 내역</h4>
+                <div id="mypage-reviews"></div>
+            </div>
+            <div class="tab-pane fade" id="qna">
+                <h4>문의 내역</h4>
+                <div id="mypage-qna"></div>
+            </div>
+        </div>
+    </div>
+
+    <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script crossorigin="anonymous"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
+    <script th:inline="javascript">
+        $(function () {
+            loadUserInfo();
+        });
+
+        function loadUserInfo() {
+            $.get('/mypage/user', function (info) {
+                var html = '<ul>';
+                html += '<li>아이디: ' + (info.username || '') + '</li>';
+                html += '<li>이름: ' + (info.name || '') + '</li>';
+                html += '<li>이메일: ' + (info.email || '') + '</li>';
+                html += '</ul>';
+                $('#user-info').html(html);
+            });
+        }
+
+        function loadMyOrders() {
+            $.get('/order/list', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var o = list[i];
+                    html += '<li>주문번호: ' + (o.id || '') + ', 금액: ' + (o.totalPrice ? o.totalPrice.toLocaleString() : 0) + '원, 상태: ' + (o.status || '') +
+                        ' <button class="btn btn-xs btn-warning mypage-order-edit" data-id="' + o.id + '" data-status="' + (o.status || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger mypage-order-del" data-id="' + o.id + '">삭제</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#mypage-orders').html(html);
+            });
+        }
+
+        function loadMyCart() {
+            $.get('/cart/list', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var c = list[i];
+                    html += '<li>' + (c.productName || '') + ' / ' + c.quantity + '개 / ' + (c.price ? c.price.toLocaleString() : 0) + '원' +
+                        ' <button class="btn btn-xs btn-warning mypage-cart-edit" data-id="' + c.id + '" data-quantity="' + c.quantity + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger mypage-cart-del" data-id="' + c.id + '">삭제</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#mypage-cart').html(html);
+            });
+        }
+
+        function loadMyReviews() {
+            $.get('/review/list', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var r = list[i];
+                    html += '<li>' + (r.productId || '') + ' / ' + (r.rating || '') + '점 / ' + (r.content || '') +
+                        ' <button class="btn btn-xs btn-warning mypage-review-edit" data-id="' + r.id + '" data-rating="' + (r.rating || '') + '" data-content="' + (r.content || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger mypage-review-del" data-id="' + r.id + '">삭제</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#mypage-reviews').html(html);
+            });
+        }
+
+        $(document).on('click', '.mypage-review-edit', function () {
+            var id = $(this).data('id');
+            var rating = prompt('별점 수정(1~5)', $(this).data('rating'));
+            var content = prompt('리뷰 내용 수정', $(this).data('content'));
+            if (rating && content) {
+                $.ajax({
+                    url: '/review/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, rating: rating, content: content}),
+                    success: loadMyReviews
+                });
+            }
+        });
+
+        $(document).on('click', '.mypage-review-del', function () {
+            var id = $(this).data('id');
+            if (confirm('리뷰를 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/review/delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id}),
+                    success: loadMyReviews
+                });
+            }
+        });
+
+        function loadMyQna() {
+            $.get('/qna/list', function (list) {
+                var html = '<ul>';
+                for (var i = 0; i < list.length; i++) {
+                    var q = list[i];
+                    html += '<li>' + (q.productId || '') + ' / ' + (q.question || '') + ' / 답변: ' + (q.answer || '-') +
+                        ' <button class="btn btn-xs btn-warning mypage-qna-edit" data-id="' + q.id + '" data-question="' + (q.question || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger mypage-qna-del" data-id="' + q.id + '">삭제</button>' + '</li>';
+                }
+                html += '</ul>';
+                $('#mypage-qna').html(html);
+            });
+        }
+
+        $(document).on('click', '.mypage-qna-edit', function () {
+            var id = $(this).data('id');
+            var question = prompt('문의 내용 수정', $(this).data('question'));
+            if (question) {
+                $.ajax({
+                    url: '/qna/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, question: question}),
+                    success: loadMyQna
+                });
+            }
+        });
+
+        $(document).on('click', '.mypage-qna-del', function () {
+            var id = $(this).data('id');
+            if (confirm('문의를 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/qna/delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id}),
+                    success: loadMyQna
+                });
+            }
+        });
+
+        $('#mypage-tabs a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+            var id = $(this).attr('href');
+            if (id === "#info") loadUserInfo();
+            else if (id === "#orders") loadMyOrders();
+            else if (id === "#cart") loadMyCart();
+            else if (id === "#reviews") loadMyReviews();
+            else if (id === "#qna") loadMyQna();
+        });
+
+        // 주문내역 등록/수정 폼 및 기능
+        $('#mypage-orders').before('<div id="order-form"><input type="number" id="order-total-price" placeholder="총금액"><input type="text" id="order-status" placeholder="상태"><button id="order-create" class="btn btn-sm btn-success">주문 등록</button></div>');
+        $('#order-create').click(function () {
+            var totalPrice = $('#order-total-price').val();
+            var status = $('#order-status').val();
+            $.ajax({
+                url: '/order/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({totalPrice: totalPrice, status: status}),
+                success: function () {
+                    loadMyOrders();
+                    $('#order-total-price').val('');
+                    $('#order-status').val('');
+                }
+            });
+        });
+
+        $(document).on('click', '.mypage-order-edit', function () {
+            var id = $(this).data('id');
+            var status = prompt('주문 상태 수정', $(this).data('status'));
+            if (status) {
+                $.ajax({
+                    url: '/order/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, status: status}),
+                    success: loadMyOrders
+                });
+            }
+        });
+
+        $(document).on('click', '.mypage-order-del', function () {
+            var id = $(this).data('id');
+            if (confirm('주문을 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/order/delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id}),
+                    success: loadMyOrders
+                });
+            }
+        });
+
+        // 장바구니 등록/수정 폼 및 기능
+        $('#mypage-cart').before('<div id="cart-form"><input type="text" id="cart-product-name" placeholder="상품명"><input type="number" id="cart-quantity" placeholder="수량"><input type="number" id="cart-price" placeholder="가격"><button id="cart-add" class="btn btn-sm btn-success">장바구니 추가</button></div>');
+        $('#cart-add').click(function () {
+            var productName = $('#cart-product-name').val();
+            var quantity = $('#cart-quantity').val();
+            var price = $('#cart-price').val();
+            $.ajax({
+                url: '/cart/add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({productName: productName, quantity: quantity, price: price}),
+                success: function () {
+                    loadMyCart();
+                    $('#cart-product-name').val('');
+                    $('#cart-quantity').val('');
+                    $('#cart-price').val('');
+                }
+            });
+        });
+
+        $(document).on('click', '.mypage-cart-edit', function () {
+            var id = $(this).data('id');
+            var quantity = prompt('수량 수정', $(this).data('quantity'));
+            if (quantity) {
+                $.ajax({
+                    url: '/cart/update',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id, quantity: quantity}),
+                    success: loadMyCart
+                });
+            }
+        });
+
+        $(document).on('click', '.mypage-cart-del', function () {
+            var id = $(this).data('id');
+            if (confirm('장바구니에서 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/cart/delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({id: id}),
+                    success: loadMyCart
+                });
+            }
+        });
+
+        // 리뷰 등록/수정 폼 및 기능
+        $('#mypage-reviews').before('<div id="review-form"><input type="number" id="review-rating" min="1" max="5" placeholder="별점(1~5)"><input type="text" id="review-content" placeholder="리뷰 내용"><button id="review-create" class="btn btn-sm btn-success">리뷰 등록</button></div>');
+        $('#review-create').click(function () {
+            var rating = $('#review-rating').val();
+            var content = $('#review-content').val();
+            $.ajax({
+                url: '/review/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({rating: rating, content: content}),
+                success: function () {
+                    loadMyReviews();
+                    $('#review-rating').val('');
+                    $('#review-content').val('');
+                }
+            });
+        });
+
+        // 문의 등록/수정 폼 및 기능
+        $('#mypage-qna').before('<div id="qna-form"><input type="text" id="qna-question" placeholder="문의 내용"><button id="qna-create" class="btn btn-sm btn-success">문의 등록</button></div>');
+        $('#qna-create').click(function () {
+            var question = $('#qna-question').val();
+            $.ajax({
+                url: '/qna/create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({question: question}),
+                success: function () {
+                    loadMyQna();
+                    $('#qna-question').val('');
+                }
+            });
+        });
+    </script>
+</section>
+<div th:replace="layout/footer :: footer"></div>
+</body>
+</html>
