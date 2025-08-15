@@ -12,6 +12,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 
 @Configuration
 public class SecurityConfig implements WebMvcConfigurer {
@@ -30,6 +32,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**", "/login", "/signup", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/product/list", "/product/detail/**", "/main", "/api/products").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/product/create", "/product/update/**", "/product/delete", "/cart/**", "/order/**").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -59,7 +62,7 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
+    public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:8080")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
@@ -68,8 +71,13 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/product/images/**")
                 .addResourceLocations("classpath:/static/images/");
+    }
+
+    @Override
+    public void addViewControllers(@NonNull ViewControllerRegistry registry) {
+        // No specific view controllers to add in this configuration
     }
 }

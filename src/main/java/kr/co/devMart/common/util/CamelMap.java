@@ -3,12 +3,12 @@ package kr.co.devMart.common.util;
 
 import org.apache.commons.collections4.map.ListOrderedMap;
 
-public class CamelMap extends ListOrderedMap {
+public class CamelMap extends ListOrderedMap<String, Object> {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public Object put(Object key, Object value){
-        return super.put(convert2CamelCase((String)key), value);
+    public Object put(String key, Object value){
+        return super.put(convert2CamelCase(key), value);
     }
 
     public String getDefault(Object key, String defaultValue) {

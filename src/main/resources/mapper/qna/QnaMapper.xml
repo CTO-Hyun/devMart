@@ -2,20 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.devMart.mapper.QnaMapper">
     <select id="selectQnaListByUser" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_QNA WHERE username = #{username} ORDER BY reg_date DESC
+        SELECT * FROM TB_QNA WHERE USERNAME = #{username} ORDER BY REG_DATE DESC
     </select>
     <select id="selectQnaListByProduct" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_QNA WHERE product_id = #{productId} ORDER BY reg_date DESC
+        SELECT * FROM TB_QNA WHERE PRODUCT_ID = #{productId} ORDER BY REG_DATE DESC
     </select>
     <insert id="insertQna">
-        INSERT INTO TB_QNA (product_id, username, question, reg_date)
+        INSERT INTO TB_QNA (PRODUCT_ID, USERNAME, QUESTION, REG_DATE)
         VALUES (#{productId}, #{username}, #{question}, NOW())
     </insert>
     <update id="updateQna">
-        UPDATE TB_QNA SET question=#{question}, answer=#{answer}, upd_date=NOW()
-        WHERE id=#{id} AND username=#{username}
+        UPDATE TB_QNA SET QUESTION=#{question}, ANSWER=#{answer}, UPD_DATE=NOW()
+        WHERE ID=#{id} AND USERNAME=#{username}
     </update>
     <delete id="deleteQna">
-        DELETE FROM TB_QNA WHERE id=#{id} AND username=#{username}
+        DELETE FROM TB_QNA WHERE ID=#{id} AND USERNAME=#{username}
     </delete>
 </mapper>

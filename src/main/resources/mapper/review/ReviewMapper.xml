@@ -2,20 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.devMart.mapper.ReviewMapper">
     <select id="selectReviewListByUser" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_REVIEW WHERE username = #{username} ORDER BY reg_date DESC
+        SELECT * FROM TB_REVIEW WHERE USER_NAME = #{userName} ORDER BY REG_DATE DESC
     </select>
     <select id="selectReviewListByProduct" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_REVIEW WHERE product_id = #{productId} ORDER BY reg_date DESC
+        SELECT * FROM TB_REVIEW WHERE PRODUCT_ID = #{productId} ORDER BY REG_DATE DESC
+        <if test="limit != null and limit &gt; 0">
+            LIMIT #{limit}
+        </if>
+        <if test="offset != null and offset &gt;= 0">
+            OFFSET #{offset}
+        </if>
+    </select>
+    <select id="selectReviewCountByProduct" resultType="int">
+        SELECT COUNT(*) FROM TB_REVIEW WHERE PRODUCT_ID = #{productId}
     </select>
     <insert id="insertReview">
-        INSERT INTO TB_REVIEW (product_id, username, rating, content, reg_date)
-        VALUES (#{productId}, #{username}, #{rating}, #{content}, NOW())
+        INSERT INTO TB_REVIEW (PRODUCT_ID, USER_NAME, RATING, CONTENT, REG_DATE)
+        VALUES (#{productId}, #{userName}, #{rating}, #{content}, NOW())
     </insert>
     <update id="updateReview">
-        UPDATE TB_REVIEW SET rating=#{rating}, content=#{content}, upd_date=NOW()
-        WHERE id=#{id} AND username=#{username}
+        UPDATE TB_REVIEW SET RATING=#{rating}, CONTENT=#{content}, UPD_DATE=NOW()
+        WHERE ID=#{id} AND USER_NAME=#{userName}
     </update>
     <delete id="deleteReview">
-        DELETE FROM TB_REVIEW WHERE id=#{id} AND username=#{username}
+        DELETE FROM TB_REVIEW WHERE ID=#{id} AND USER_NAME=#{userName}
     </delete>
 </mapper>

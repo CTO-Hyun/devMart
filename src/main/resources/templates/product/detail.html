@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
     <title>상품 상세 | devMart</title>
@@ -9,58 +10,121 @@
           rel="stylesheet">
 </head>
 <body>
-<div th:replace="layout/header :: header"></div>
-<section>
+<section layout:fragment="content">
     <div class="container" style="max-width:900px;margin:60px auto;">
-        <h2 th:text="${product.name}">상품명</h2>
-        <div>
-            <img style="max-width:300px;" th:src="@{${product.imageUrl}}">
-            <p>가격: <span th:text="${product.price}"></span> 원</p>
-            <p>설명: <span th:text="${product.description}"></span></p>
-        </div>
-        <ul class="nav nav-tabs" id="product-tabs">
-            <li class="active"><a data-toggle="tab" href="#review">리뷰</a></li>
-            <li><a data-toggle="tab" href="#qna">문의</a></li>
-        </ul>
-        <div class="tab-content" style="margin-top:20px;">
-            <div class="tab-pane fade in active" id="review">
-                <h4>리뷰</h4>
-                <div id="review-list"></div>
-                <div id="review-form">
-                    <input id="review-rating" max="5" min="1" placeholder="별점(1~5)" type="number">
-                    <input id="review-content" placeholder="리뷰 내용" style="width:300px;" type="text">
-                    <button class="btn btn-sm btn-primary" id="review-submit">리뷰 등록</button>
+        <th:block th:if="${errorMsg != null}">
+            <div class="alert alert-danger" style="margin:40px 0; text-align:center;">[[${errorMsg}]]</div>
+        </th:block>
+        <th:block th:if="${errorMsg == null}">
+            <div class="row" style="margin-top:40px;">
+                <div class="col-md-6 text-center">
+                    <img th:src="@{${product.imageUrl}}" alt="상품 이미지" style="max-width:100%;height:auto;border-radius:12px;box-shadow:0 2px 12px #eee;">
+                </div>
+                <div class="col-md-6" style="display:flex;flex-direction:column;justify-content:center;">
+                    <h2 style="font-weight:bold;margin-bottom:20px;">[[${product.name}]]</h2>
+                    <div style="font-size:1.3em;margin-bottom:10px;">
+                        <span style="color:#e74c3c;font-weight:bold;">[[${#numbers.formatInteger(product.price, 0, 'COMMA')}]]원</span>
+                        <span th:if="${product.discountRate != null && product.discountRate > 0}" style="color:#27ae60;font-size:0.9em;margin-left:10px;">[[${product.discountRate}]]% 할인</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <span th:if="${product.brand != null}"><b>브랜드:</b> [[${product.brand}]]</span>
+                        <span th:if="${product.categoryType != null}" style="margin-left:15px;"><b>카테고리:</b> [[${product.categoryType}]]</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <span th:if="${product.stock != null}"><b>재고:</b> [[${product.stock}]]개</span>
+                        <span th:if="${product.rating != null}" style="margin-left:15px;"><b>평점:</b> [[${product.rating}]]</span>
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <span th:if="${product.tags != null}"><b>태그:</b> [[${product.tags}]]</span>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <span th:text="${product.description}"></span>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <button class="btn btn-success btn-lg" style="margin-right:10px;">장바구니 담기</button>
+                        <button class="btn btn-primary btn-lg">바로구매</button>
+                    </div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="qna">
-                <h4>문의</h4>
-                <div id="qna-list"></div>
-                <div id="qna-form">
-                    <input id="qna-question" placeholder="문의 내용" style="width:300px;" type="text">
-                    <button class="btn btn-sm btn-info" id="qna-submit">문의 등록</button>
+            <div class="row" style="margin-top:40px;">
+                <div class="col-md-12">
+                    <ul class="nav nav-tabs" id="product-tabs">
+                        <li class="active"><a data-toggle="tab" href="#review">리뷰</a></li>
+                        <li><a data-toggle="tab" href="#qna">문의</a></li>
+                    </ul>
+                    <div class="tab-content" style="margin-top:20px;">
+                        <div class="tab-pane fade in active" id="review">
+                            <h4 style="font-weight:bold;">리뷰</h4>
+                            <div id="review-list" style="margin-bottom:20px;"></div>
+                            <div id="review-form" class="card" style="padding:15px 20px;max-width:500px;">
+                                <div class="form-inline">
+                                    <input id="review-rating" max="5" min="1" placeholder="별점(1~5)" type="number" class="form-control" style="width:100px;">
+                                    <input id="review-content" placeholder="리뷰 내용" style="width:250px;" type="text" class="form-control">
+                                    <button class="btn btn-sm btn-primary" id="review-submit">리뷰 등록</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="qna">
+                            <h4 style="font-weight:bold;">문의</h4>
+                            <div id="qna-list" style="margin-bottom:20px;"></div>
+                            <div id="qna-form" class="card" style="padding:15px 20px;max-width:500px;">
+                                <div class="form-inline">
+                                    <input id="qna-question" placeholder="문의 내용" style="width:300px;" type="text" class="form-control">
+                                    <button class="btn btn-sm btn-info" id="qna-submit">문의 등록</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </th:block>
     </div>
     <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script crossorigin="anonymous"
             src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
 
     <script th:inline="javascript">
-        function loadReviews() {
-            var productId = [[${product.id}]];
-            $.get('/review/product', {productId: productId}, function (list) {
+        var productId = [[${product.id}]];
+        var reviewPage = 1;
+        var reviewPageSize = 10;
+        function loadReviews(page) {
+            page = page || 1;
+            $.get('/review/product', {productId: productId, page: page, size: reviewPageSize}, function (result) {
+                var list = result.reviews || [];
+                var totalCount = result.totalCount || 0;
                 var html = '<ul>';
-                for (var i = 0; i < list.length; i++) {
-                    var r = list[i];
-                    html += '<li>[' + r.rating + '점] ' + (r.content || '') + ' - ' + (r.username || '') +
-                        ' <button class="btn btn-xs btn-warning review-edit" data-id="' + r.id + '" data-content="' + (r.content || '') + '" data-rating="' + (r.rating || '') + '">수정</button>' +
-                        ' <button class="btn btn-xs btn-danger review-del" data-id="' + r.id + '">삭제</button>' + '</li>';
+                if (!list || list.length === 0) {
+                    html += '<li>리뷰가 없습니다.</li>';
+                } else {
+                    for (var i = 0; i < list.length; i++) {
+                        var r = list[i];
+                        html += '<li>[' + (r.rating || '-') + '점] ' + (r.content || '-') + ' - ' + (r.userName || '-') +
+                            ' <button class="btn btn-xs btn-warning review-edit" data-id="' + r.id + '" data-content="' + (r.content || '') + '" data-rating="' + (r.rating || '') + '">수정</button>' +
+                            ' <button class="btn btn-xs btn-danger review-del" data-id="' + r.id + '">삭제</button>' + '</li>';
+                    }
                 }
                 html += '</ul>';
-                $('#review-list').html(html);
+                // 페이지네이션
+                var pageHtml = '';
+                var totalPages = Math.ceil(totalCount / reviewPageSize);
+                if (totalPages > 1) {
+                    pageHtml += '<nav><ul class="pagination">';
+                    if (page > 1) pageHtml += '<li><a href="#" class="review-page" data-page="' + (page-1) + '">&laquo;</a></li>';
+                    for (var p = 1; p <= totalPages; p++) {
+                        pageHtml += '<li' + (p === page ? ' class="active"' : '') + '><a href="#" class="review-page" data-page="' + p + '">' + p + '</a></li>';
+                    }
+                    if (page < totalPages) pageHtml += '<li><a href="#" class="review-page" data-page="' + (page+1) + '">&raquo;</a></li>';
+                    pageHtml += '</ul></nav>';
+                }
+                $('#review-list').html(html + pageHtml);
+                reviewPage = page;
             });
         }
+        $(document).on('click', '.review-page', function(e) {
+            e.preventDefault();
+            var p = parseInt($(this).data('page'));
+            if (p && p !== reviewPage) loadReviews(p);
+        });
 
         $(document).on('click', '.review-del', function () {
             var id = $(this).data('id');
@@ -130,18 +194,18 @@
             }
         });
         $('#review-submit').click(function () {
-            var productId = [[${product.id}]];
             var rating = $('#review-rating').val();
             var content = $('#review-content').val();
             $.ajax({
                 url: '/review/create',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({productId: productId, rating: rating, content: content}),
+                data: JSON.stringify({ productId: productId, rating: rating, content: content }),
                 success: function () {
-                    loadReviews();
-                    $('#review-content').val('');
+                    alert('리뷰가 등록되었습니다.');
+                    loadReviews(1);
                     $('#review-rating').val('');
+                    $('#review-content').val('');
                 },
                 error: function () {
                     alert('리뷰 등록 실패');
@@ -173,10 +237,9 @@
             else if (id === "#qna") loadQna();
         });
         $(function () {
-            loadReviews();
+            loadReviews(1);
         });
     </script>
-    <div th:replace="layout/footer :: footer"></div>
 </section>
 </body>
 </html>

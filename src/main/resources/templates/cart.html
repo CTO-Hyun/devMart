@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
     <title>장바구니 | devMart</title>
@@ -9,8 +10,7 @@
           rel="stylesheet">
 </head>
 <body>
-<div th:replace="layout/header :: header"></div>
-<div class="container" style="max-width:900px;margin:60px auto;">
+<div class="container" style="max-width:900px;margin:60px auto;" layout:fragment="content">
     <h2 style="text-align:center; margin-bottom:30px;">장바구니</h2>
     <table class="table table-bordered table-hover">
         <thead>
@@ -29,14 +29,77 @@
         </tr>
         </tfoot>
     </table>
+    <div id="cart-empty-msg" style="display:none; text-align:center; color:#888; margin:30px 0;">장바구니가 비어있습니다.</div>
+    <button class="btn btn-primary" id="cart-order-btn" style="float:left;">장바구니 전체 구매</button>
     <button class="btn btn-danger pull-right" id="cart-clear-btn">장바구니 전체 비우기</button>
 </div>
-<div th:replace="layout/footer :: footer"></div>
 
 <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script th:inline="javascript">
     $(function () {
         loadCart();
+
+        // 로그인 체크 함수
+        function isLoggedIn() {
+            // 세션/쿠키/로컬스토리지 등에서 로그인 여부 판단 (임시: 서버에서 401/403 응답 시로 대체)
+            return true;
+        }
+
+        // 장바구니 전체 구매(주문)
+        $('#cart-order-btn').off('click').on('click', function () {
+            if (!isLoggedIn()) {
+                alert('로그인 후 이용 가능합니다.');
+                return;
+            }
+            $.get('/cart/list', function (list) {
+                if (list.length === 0) {
+                    alert('장바구니가 비어있습니다.');
+                    return;
+                }
+                var items = [];
+                var totalPrice = 0;
+                for (var i = 0; i < list.length; i++) {
+                    var item = list[i];
+                    var qty = parseInt(item.quantity) || 0;
+                    var price = parseInt(item.price) || 0;
+                    items.push({ productId: item.productId, quantity: qty, price: price });
+                    totalPrice += price * qty;
+                }
+                $.ajax({
+                    url: '/order/create',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ totalPrice: totalPrice, items: items }),
+                    success: function () {
+                        alert('주문이 완료되었습니다.');
+                        loadCart();
+                    },
+                    error: function (xhr) {
+                        alert('주문 실패: ' + xhr.status + '\n' + (xhr.responseText || '서버 오류'));
+                    }
+                });
+            });
+        });
+
+        // 장바구니 전체 비우기
+        $('#cart-clear-btn').off('click').on('click', function () {
+            if (!isLoggedIn()) {
+                alert('로그인 후 이용 가능합니다.');
+                return;
+            }
+            if (confirm('장바구니를 모두 비우시겠습니까?')) {
+                $.ajax({
+                    url: '/cart/clear',
+                    type: 'POST',
+                    success: function () {
+                        loadCart();
+                    },
+                    error: function (xhr) {
+                        alert('장바구니 비우기 실패: ' + xhr.status + '\n' + (xhr.responseText || '서버 오류'));
+                    }
+                });
+            }
+        });
     });
 
     function loadCart() {
@@ -46,18 +109,27 @@
             var totalPrice = 0;
             for (var i = 0; i < list.length; i++) {
                 var item = list[i];
+                var qty = parseInt(item.quantity) || 0;
+                var price = parseInt(item.price) || 0;
                 html += '<tr>' +
-                    '<td>' + (item.productName || '') + '</td>' +
-                    '<td><input type="number" min="1" value="' + item.quantity + '" class="cart-qty-input" data-id="' + item.id + '" style="width:60px;"/></td>' +
-                    '<td>' + (item.price ? item.price.toLocaleString() : 0) + '원</td>' +
-                    '<td>' + ((item.price * item.quantity) ? (item.price * item.quantity).toLocaleString() : 0) + '원</td>' +
+                    '<td><a href="/product/detail?productId=' + item.productId + '" style="color:#337ab7; text-decoration:underline;">' + (item.productName || '') + '</a></td>' +
+                    '<td><input type="number" min="1" value="' + qty + '" class="cart-qty-input" data-id="' + item.id + '" style="width:60px;"/></td>' +
+                    '<td>' + price.toLocaleString() + '원</td>' +
+                    '<td>' + (price * qty).toLocaleString() + '원</td>' +
                     '<td><button class="btn btn-xs btn-danger cart-delete-btn" data-id="' + item.id + '">삭제</button></td>' +
                     '</tr>';
-                totalCount += item.quantity;
-                totalPrice += (item.price * item.quantity) || 0;
+                totalCount += qty;
+                totalPrice += price * qty;
             }
             $('#cart-list').html(html);
             $('#cart-summary').html('총 ' + totalCount + '건 / ' + totalPrice.toLocaleString() + '원');
+            if (list.length === 0) {
+                $('#cart-empty-msg').show();
+                $('#cart-order-btn').prop('disabled', true);
+            } else {
+                $('#cart-empty-msg').hide();
+                $('#cart-order-btn').prop('disabled', false);
+            }
         });
     }
 
@@ -92,14 +164,6 @@
                 alert('삭제 실패');
             }
         });
-    });
-
-    $('#cart-clear-btn').on('click', function () {
-        if (confirm('장바구니를 모두 비우시겠습니까?')) {
-            $.post('/cart/clear', function () {
-                loadCart();
-            });
-        }
     });
 </script>
 </body>

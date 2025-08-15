@@ -1,13 +1,13 @@
 package kr.co.devMart.controller;
 
-import kr.co.devMart.service.UserService;
-import kr.co.devMart.service.OrderService;
 import kr.co.devMart.service.CartService;
+import kr.co.devMart.service.OrderService;
+import kr.co.devMart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class MypageController {
     private CartService cartService;
 
     // 회원정보 조회
-    @GetMapping("/user")
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
     public Map<String, Object> getUserInfo() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
@@ -33,7 +33,7 @@ public class MypageController {
     }
 
     // 주문내역 조회
-    @GetMapping("/orders")
+    @RequestMapping(value = "/orders", method = RequestMethod.GET)
     public List<Map<String, Object>> getOrderList() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> params = new HashMap<>();
@@ -42,7 +42,7 @@ public class MypageController {
     }
 
     // 장바구니 조회
-    @GetMapping("/cart")
+    @RequestMapping(value = "/cart", method = RequestMethod.GET)
     public List<Map<String, Object>> getCartList() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> params = new HashMap<>();

@@ -20,51 +20,72 @@ public class ProductController {
         this.productService = productService;
     }
 
+    // 상품 목록
     @RequestMapping(value = "/product/{path}", method = RequestMethod.GET)
     public void productList(@PathVariable String path, ModelMap modelMap, @RequestParam Map<String, Object> params) {
-        if(params.get("categoryType") == null){
+        if (params.get("categoryType") == null) {
             params.put("title", "전체");
-        }else if(params.get("categoryType").equals("ACC")){
+        } else if (params.get("categoryType").equals("ACC")) {
             params.put("title", "악세사리");
-        }else if(params.get("categoryType").equals("BAG")){
+        } else if (params.get("categoryType").equals("BAG")) {
             params.put("title", "가방");
-        }else if(params.get("categoryType").equals("ETC")){
+        } else if (params.get("categoryType").equals("ETC")) {
             params.put("title", "기타");
-        }else if(params.get("categoryType").equals("KIDS")){
+        } else if (params.get("categoryType").equals("KIDS")) {
             params.put("title", "아동");
-        }else if(params.get("categoryType").equals("MEN")){
+        } else if (params.get("categoryType").equals("MEN")) {
             params.put("title", "남성복");
-        }else if(params.get("categoryType").equals("SHOES")){
+        } else if (params.get("categoryType").equals("SHOES")) {
             params.put("title", "신발");
-        }else if(params.get("categoryType").equals("SPORTS")){
+        } else if (params.get("categoryType").equals("SPORTS")) {
             params.put("title", "운동복");
-        }else if(params.get("categoryType").equals("WOMEN")){
+        } else if (params.get("categoryType").equals("WOMEN")) {
             params.put("title", "여성복");
         }
         modelMap.addAttribute("params", params);
         modelMap.addAttribute("products", productService.getProductList(params));
     }
-    
+
+    // 상품 상세 (파라미터 방식)
+    @RequestMapping(value = "/product/detail", method = RequestMethod.GET)
+    public String productDetailParam(@RequestParam(value = "productId") Long productId, ModelMap modelMap) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", productId);
+        Map<String, Object> product = productService.getProductById(params);
+        if (product == null) {
+            modelMap.addAttribute("errorMsg", "상품을 찾을 수 없습니다.");
+            return "product/detail";
+        }
+        modelMap.addAttribute("product", product);
+        return "product/detail";
+    }
+
+    // 상품 상세 (PathVariable 방식)
     @RequestMapping(value = "/product/detail/{id}", method = RequestMethod.GET)
     public String productDetail(@PathVariable Long id, ModelMap modelMap) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
-        
         Map<String, Object> product = productService.getProductById(params);
+        if (product == null) {
+            modelMap.addAttribute("errorMsg", "상품을 찾을 수 없습니다.");
+            return "product/detail";
+        }
         modelMap.addAttribute("product", product);
         return "product/detail";
     }
-    
+
+    // 상품 등록 폼
     @RequestMapping(value = "/product/create", method = RequestMethod.GET)
     public String productCreateForm() {
         return "product/create";
     }
-    
+
+    // 상품 등록
     @RequestMapping(value = "/product/create", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> createProduct(@RequestParam Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             int count = productService.createProduct(params);
             if (count > 0) {
@@ -78,25 +99,27 @@ public class ProductController {
             result.put("success", false);
             result.put("message", "오류가 발생했습니다: " + e.getMessage());
         }
-        
+
         return result;
     }
-    
+
+    // 상품 수정 폼
     @RequestMapping(value = "/product/update/{id}", method = RequestMethod.GET)
     public String productUpdateForm(@PathVariable Long id, ModelMap modelMap) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", id);
-        
+
         Map<String, Object> product = productService.getProductById(params);
         modelMap.addAttribute("product", product);
         return "product/update";
     }
-    
+
+    // 상품 수정
     @RequestMapping(value = "/product/update", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> updateProduct(@RequestParam Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             int count = productService.updateProduct(params);
             if (count > 0) {
@@ -110,15 +133,16 @@ public class ProductController {
             result.put("success", false);
             result.put("message", "오류가 발생했습니다: " + e.getMessage());
         }
-        
+
         return result;
     }
-    
+
+    // 상품 삭제
     @RequestMapping(value = "/product/delete", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> deleteProduct(@RequestParam Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             int count = productService.deleteProduct(params);
             if (count > 0) {
@@ -132,19 +156,20 @@ public class ProductController {
             result.put("success", false);
             result.put("message", "오류가 발생했습니다: " + e.getMessage());
         }
-        
+
         return result;
     }
-    
+
+    // 상품 API (프론트용)
     @RequestMapping(value = "/api/products", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> getProductsApi(@RequestParam Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try {
             List<Map<String, Object>> products = productService.getProductListWithPaging(params);
             int totalCount = productService.getProductCount(params);
-            
+
             result.put("success", true);
             result.put("data", products);
             result.put("totalCount", totalCount);
@@ -152,10 +177,11 @@ public class ProductController {
             result.put("success", false);
             result.put("message", "오류가 발생했습니다: " + e.getMessage());
         }
-        
+
         return result;
     }
 
+    // 메인
     @RequestMapping(value = "/main", method = RequestMethod.GET)
     public String priorOrderPlnPopup(@RequestParam Map<String, Object> params) {
         return "main/main";

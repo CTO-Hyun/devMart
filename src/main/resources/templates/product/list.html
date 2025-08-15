@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html layout:decorate="~{layout/default}"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/default}">
 <head>
     <title>devMart</title>
     <meta charset="UTF-8">
@@ -25,7 +24,7 @@
                         <p><strong th:class="${product.price < 50000} ? 'rainbow-text' : ''"
                                    th:text="${product.price < 0 ? '0 원' : #numbers.formatInteger(product.price, 0, 'COMMA') + ' 원'}"></strong>
                         </p>
-                        <button class="btn btn-sm btn-primary" type="button">구매</button>
+                        <button class="btn btn-sm btn-primary" type="button" th:onclick="|location.href='/product/detail?productId=' + ${product.id}|">상세보기</button>
                         <button class="btn btn-sm btn-info add-to-cart-btn"
                                 th:attr="data-product-id=${product.id},data-product-name=${product.name},data-price=${product.price}"
                                 type="button">
@@ -41,7 +40,9 @@
     <script th:inline="javascript">
         // 페이지 로드 시 장바구니 정보 갱신
         $(function () {
-            loadCart();
+            if (typeof updateCartSummary === 'function') {
+                updateCartSummary();
+            }
         });
 
         // 장바구니 담기 버튼 클릭 시 AJAX로 백엔드 호출

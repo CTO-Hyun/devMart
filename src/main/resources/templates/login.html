@@ -1,18 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+      layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
     <title>로그인 | DEVMART</title>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
     <link rel="stylesheet" th:href="@{/css/responsive.css}"/>
-    <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-          rel="stylesheet">
     <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
           rel="stylesheet">
 </head>
 <body>
-<div th:replace="layout/header :: header"></div>
-<div class="container" style="max-width:400px;margin:100px auto 60px auto;">
+<div class="container" style="max-width:400px;margin:100px auto 60px auto;" layout:fragment="content">
     <h2 style="text-align:center; margin-bottom:30px;">로그인</h2>
     <form method="post" th:action="@{/login}">
         <div class="form-group" style="margin-bottom:20px;">
@@ -27,6 +25,5 @@
         <button class="btn btn-primary btn-block" style="width:100%;" type="submit">로그인</button>
     </form>
 </div>
-<div th:replace="layout/footer :: footer"></div>
 </body>
 </html>

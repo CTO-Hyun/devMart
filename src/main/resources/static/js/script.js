@@ -64,8 +64,10 @@
                     var totalCount = 0;
                     var totalPrice = 0;
                     for (var i = 0; i < cartList.length; i++) {
-                        totalCount += cartList[i].quantity;
-                        totalPrice += (cartList[i].quantity * cartList[i].price || 0);
+                        var qty = parseInt(cartList[i].quantity) || 0;
+                        var price = parseInt(cartList[i].price) || 0;
+                        totalCount += qty;
+                        totalPrice += price * qty;
                     }
                     $(".cart-text").html('장바구니<br>' + totalCount + ' 건 - ' + totalPrice.toLocaleString() + '원');
                 },
