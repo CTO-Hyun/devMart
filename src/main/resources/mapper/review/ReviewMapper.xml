@@ -9,7 +9,8 @@
     </select>
 
     <select id="selectReviewListByProduct" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_REVIEW
+        SELECT ID, USER_ID, USER_NAME, PRODUCT_ID, RATING, CONTENT, REG_DATE, UPD_DATE
+        FROM TB_REVIEW
         WHERE PRODUCT_ID = #{productId}
         ORDER BY REG_DATE DESC
         <if test="limit != null and limit &gt; 0">

@@ -8,19 +8,32 @@
     </select>
 
     <select id="selectQnaListByProduct" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_QNA
+        SELECT ID, USER_ID, USERNAME, PRODUCT_ID, QUESTION, ANSWER, IFNULL(IS_SECRET,0) AS isSecret, REG_DATE, UPD_DATE
+        FROM TB_QNA
         WHERE PRODUCT_ID = #{productId}
         ORDER BY REG_DATE DESC
+        <if test="limit != null and limit &gt; 0">
+            LIMIT #{limit}
+        </if>
+        <if test="offset != null and offset &gt;= 0">
+            OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="selectQnaCountByProduct" resultType="int">
+        SELECT COUNT(*) FROM TB_QNA WHERE PRODUCT_ID = #{productId}
     </select>
 
     <insert id="insertQna">
         INSERT INTO TB_QNA ( PRODUCT_ID
                            , USERNAME
                            , QUESTION
+                           , IS_SECRET
                            , REG_DATE)
         VALUES ( #{productId}
                , #{username}
                , #{question}
+               , #{isSecret}
                , NOW())
     </insert>
 
@@ -28,6 +41,7 @@
         UPDATE TB_QNA
         SET QUESTION = #{question},
             ANSWER = #{answer},
+            IS_SECRET = #{isSecret},
             UPD_DATE = NOW()
         WHERE ID = #{id}
           AND USERNAME = #{username}

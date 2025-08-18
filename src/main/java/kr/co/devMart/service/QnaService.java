@@ -26,6 +26,11 @@ public class QnaService {
         return qnaMapper.selectQnaListByProduct(params);
     }
 
+    // 상품별 문의 전체 개수 조회 (페이징)
+    public int getQnaCountByProduct(Map<String, Object> params) {
+        return qnaMapper.selectQnaCountByProduct(params);
+    }
+
     // 문의 등록
     public int addQna(Map<String, Object> params) {
         return qnaMapper.insertQna(params);

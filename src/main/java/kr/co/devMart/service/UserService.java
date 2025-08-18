@@ -1,8 +1,8 @@
 package kr.co.devMart.service;
 
 import kr.co.devMart.mapper.UserMapper;
+import kr.co.devMart.common.auth.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -81,10 +81,8 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username);
         }
         String password = (String) user.get("password");
-        return User.builder()
-                .username(username)
-                .password(password)
-                .authorities(Collections.singletonList(() -> "ROLE_USER"))
-                .build();
+        Long id = user.get("id") != null ? Long.parseLong(user.get("id").toString()) : null;
+        List<org.springframework.security.core.GrantedAuthority> authorities = Collections.singletonList(() -> "ROLE_USER");
+        return new CustomUserDetails(id, username, password, authorities);
     }
 }

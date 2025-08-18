@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import kr.co.devMart.common.auth.CustomUserDetails;
 
 @Controller
 public class ProductController {
@@ -56,6 +59,19 @@ public class ProductController {
             modelMap.addAttribute("errorMsg", "상품을 찾을 수 없습니다.");
             return "product/detail";
         }
+        // 로그인 사용자 userId 내려주기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+        Long loginUserId = 0L;
+        String loginUserName = "";
+        if (principal instanceof CustomUserDetails) {
+            loginUserId = ((CustomUserDetails) principal).getId();
+            loginUserName = ((CustomUserDetails) principal).getUsername();
+        }
+        params.put("loginUserId", loginUserId);
+        params.put("loginUserName", loginUserName);
+        modelMap.addAttribute("loginUserId", loginUserId);
+        modelMap.addAttribute("loginUserName", loginUserName);
         modelMap.addAttribute("product", product);
         return "product/detail";
     }
@@ -70,6 +86,19 @@ public class ProductController {
             modelMap.addAttribute("errorMsg", "상품을 찾을 수 없습니다.");
             return "product/detail";
         }
+        // 로그인 사용자 userId 내려주기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+        Long loginUserId = 0L;
+        String loginUserName = "";
+        if (principal instanceof CustomUserDetails) {
+            loginUserId = ((CustomUserDetails) principal).getId();
+            loginUserName = ((CustomUserDetails) principal).getUsername();
+        }
+        params.put("loginUserId", loginUserId);
+        params.put("loginUserName", loginUserName);
+        modelMap.addAttribute("loginUserId", loginUserId);
+        modelMap.addAttribute("loginUserName", loginUserName);
         modelMap.addAttribute("product", product);
         return "product/detail";
     }

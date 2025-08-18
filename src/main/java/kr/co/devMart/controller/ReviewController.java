@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import kr.co.devMart.common.auth.CustomUserDetails;
 
 @RestController
 @RequestMapping("/review")
@@ -43,11 +44,17 @@ public class ReviewController {
     }
 
     // 리뷰 등록
-    @PostMapping("/create")
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> addReview(@RequestParam Map<String, Object> params) {
+    public Map<String, Object> addReview(@RequestBody Map<String, Object> params) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        params.put("userName", auth.getName());
+        Object principal = auth.getPrincipal();
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
+            params.put("userName", auth.getName());
+            if (principal instanceof CustomUserDetails) {
+                params.put("userId", ((CustomUserDetails) principal).getId());
+            }
+        }
         int result = reviewService.addReview(params);
         Map<String, Object> res = new HashMap<>();
         res.put("success", result > 0);
@@ -57,12 +64,25 @@ public class ReviewController {
     // 리뷰 수정
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public int updateReview(@RequestBody Map<String, Object> params) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
+            params.put("userName", auth.getName());
+            if (principal instanceof CustomUserDetails) {
+                params.put("userId", ((CustomUserDetails) principal).getId());
+            }
+        }
         return reviewService.updateReview(params);
     }
 
     // 리뷰 삭제
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public int deleteReview(@RequestBody Map<String, Object> params) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            params.put("userId", ((CustomUserDetails) principal).getId());
+        }
         return reviewService.deleteReview(params);
     }
 }

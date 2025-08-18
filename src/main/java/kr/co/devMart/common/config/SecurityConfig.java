@@ -32,6 +32,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**", "/login", "/signup", "/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/product/list", "/product/detail/**", "/main", "/api/products").permitAll()
+                        .requestMatchers("/review/product", "/qna/product").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/product/create", "/product/update/**", "/product/delete", "/cart/**", "/order/**").authenticated()
                         .anyRequest().authenticated()

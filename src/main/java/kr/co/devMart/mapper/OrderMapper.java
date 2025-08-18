@@ -18,4 +18,6 @@ public interface OrderMapper {
     int updateOrderStatus(Map<String, Object> params);
 
     int deleteOrder(Map<String, Object> params);
+
+    int deleteCartByUser(Map<String, Object> params);
 }

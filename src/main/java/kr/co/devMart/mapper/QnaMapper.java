@@ -16,4 +16,6 @@ public interface QnaMapper {
     int updateQna(Map<String, Object> params);
 
     int deleteQna(Map<String, Object> params);
+
+    int selectQnaCountByProduct(Map<String, Object> params);
 }

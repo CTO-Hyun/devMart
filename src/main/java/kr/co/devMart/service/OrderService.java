@@ -35,8 +35,19 @@ public class OrderService {
     public int createOrder(Map<String, Object> params) {
         log.info("[주문생성] params={}", params);
         try {
+            // 주문 테이블에 INSERT
             int result = orderMapper.insertOrder(params);
             log.info("[주문생성] 성공, result={}", result);
+            // 주문상품 테이블에 items 전체 INSERT
+            List<Map<String, Object>> items = (List<Map<String, Object>>) params.get("items");
+            if (items != null) {
+                for (Map<String, Object> item : items) {
+                    item.put("orderId", params.get("orderId"));
+                    orderMapper.insertOrderItem(item);
+                }
+            }
+            // 3. 장바구니 전체 비우기
+            orderMapper.deleteCartByUser(params);
             return result;
         } catch (Exception e) {
             log.error("[주문생성] 실패", e);
