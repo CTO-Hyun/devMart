@@ -2,45 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.co.devMart.mapper.CartMapper">
     <select id="selectCartListByUser" parameterType="map" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT
-            c.ID AS cartId,
-            c.USER_ID,
-            c.PRODUCT_ID,
-            c.QUANTITY,
-            p.NAME AS productName,
-            p.PRICE,
-            p.IMAGE_URL
-        FROM TB_CART c
-        INNER JOIN TB_PRODUCT p 
-            ON c.PRODUCT_ID = p.ID
-        WHERE c.USER_ID = #{userId}
+        SELECT C.CART_SEQ
+            , C.USER_SEQ
+            , C.PRODUCT_SEQ
+            , C.QUANTITY
+            , P.NAME AS PRODUCT_NAME
+            , P.PRICE
+            , P.IMAGE_URL
+        FROM TB_CART C
+            INNER JOIN TB_PRODUCT P
+                ON C.PRODUCT_SEQ = P.PRODUCT_SEQ
+        WHERE C.USER_SEQ = #{userSeq}
     </select>
 
     <insert id="insertCart" parameterType="map">
-        INSERT INTO TB_CART ( USER_ID
-                            , PRODUCT_ID
-                            , QUANTITY
-                            , CREATE_DATE)
-        VALUES ( #{userId}
-               , #{productId}
-               , #{quantity}
-               , NOW())
+        INSERT INTO TB_CART ( USER_SEQ
+            , PRODUCT_SEQ
+            , QUANTITY
+            , CREATE_DATE)
+        VALUES ( #{userSeq}
+            , #{productSeq}
+            , #{quantity}
+            , NOW())
     </insert>
 
     <update id="updateCartQuantity" parameterType="map">
         UPDATE TB_CART
-        SET QUANTITY    = #{quantity},
-            UPDATE_DATE = NOW()
-        WHERE ID = #{id}
+        SET QUANTITY = #{quantity}
+            , UPDATE_DATE = NOW()
+        WHERE CART_SEQ = #{cartSeq}
     </update>
 
     <delete id="deleteCart" parameterType="map">
-        DELETE FROM TB_CART
-        WHERE ID = #{id}
+        DELETE FROM TB_CART WHERE CART_SEQ = #{cartSeq}
     </delete>
 
     <delete id="deleteCartByUser" parameterType="map">
-        DELETE FROM TB_CART
-        WHERE USER_ID = #{userId}
+        DELETE FROM TB_CART WHERE USER_SEQ = #{userSeq}
     </delete>
 </mapper>

@@ -63,9 +63,9 @@
                 for (var i = 0; i < list.length; i++) {
                     var p = list[i];
                     html += '<li>' + (p.productName || '') + ' / ' + (p.price ? p.price.toLocaleString() : 0) + '원 / 재고: ' + (p.stock || 0) +
-                        ' <button class="btn btn-xs btn-info admin-product-detail" data-id="' + p.id + '">상세</button>' +
-                        ' <button class="btn btn-xs btn-warning admin-product-edit" data-id="' + p.id + '" data-name="' + (p.productName || '') + '" data-price="' + (p.price || 0) + '" data-stock="' + (p.stock || 0) + '">수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-product-del" data-id="' + p.id + '">삭제</button>' + '</li>';
+                        ' <button class="btn btn-xs btn-info admin-product-detail" data-product-seq="' + p.productSeq + '">상세</button>' +
+                        ' <button class="btn btn-xs btn-warning admin-product-edit" data-product-seq="' + p.productSeq + '" data-name="' + (p.productName || '') + '" data-price="' + (p.price || 0) + '" data-stock="' + (p.stock || 0) + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-product-del" data-product-seq="' + p.productSeq + '">삭제</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-products').html(html);
@@ -92,7 +92,7 @@
         });
 
         $(document).on('click', '.admin-product-edit', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('product-seq');
             var name = prompt('상품명 수정', $(this).data('name'));
             var price = prompt('가격 수정', $(this).data('price'));
             var stock = prompt('재고 수정', $(this).data('stock'));
@@ -101,20 +101,20 @@
                     url: '/admin/products/update',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id, name: name, price: price, stock: stock}),
+                    data: JSON.stringify({seq: seq, name: name, price: price, stock: stock}),
                     success: loadAdminProducts
                 });
             }
         });
 
         $(document).on('click', '.admin-product-del', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('product-seq');
             if (confirm('상품을 삭제하시겠습니까?')) {
                 $.ajax({
                     url: '/admin/products/delete',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id}),
+                    data: JSON.stringify({seq: seq}),
                     success: loadAdminProducts
                 });
             }
@@ -122,8 +122,8 @@
 
         // 상품 상세보기 버튼 및 기능
         $(document).on('click', '.admin-product-detail', function () {
-            var id = $(this).data('id');
-            $.get('/admin/products/detail', {id: id}, function (p) {
+            var seq = $(this).data('product-seq');
+            $.get('/admin/products/detail', {seq: seq}, function (p) {
                 alert('상품명: ' + (p.productName || '') + '\n가격: ' + (p.price || 0) + '\n재고: ' + (p.stock || 0));
             });
         });
@@ -137,9 +137,9 @@
                 for (var i = 0; i < list.length; i++) {
                     var p = list[i];
                     html += '<li>' + (p.productName || '') + ' / ' + (p.price ? p.price.toLocaleString() : 0) + '원 / 재고: ' + (p.stock || 0) +
-                        ' <button class="btn btn-xs btn-info admin-product-detail" data-id="' + p.id + '">상세</button>' +
-                        ' <button class="btn btn-xs btn-warning admin-product-edit" data-id="' + p.id + '" data-name="' + (p.productName || '') + '" data-price="' + (p.price || 0) + '" data-stock="' + (p.stock || 0) + '">수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-product-del" data-id="' + p.id + '">삭제</button>' + '</li>';
+                        ' <button class="btn btn-xs btn-info admin-product-detail" data-product-seq="' + p.productSeq + '">상세</button>' +
+                        ' <button class="btn btn-xs btn-warning admin-product-edit" data-product-seq="' + p.productSeq + '" data-name="' + (p.productName || '') + '" data-price="' + (p.price || 0) + '" data-stock="' + (p.stock || 0) + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-product-del" data-product-seq="' + p.productSeq + '">삭제</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-products').html(html);
@@ -167,7 +167,7 @@
         });
 
         $(document).on('click', '.admin-user-edit', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('user-seq');
             var name = prompt('이름 수정', $(this).data('name'));
             var email = prompt('이메일 수정', $(this).data('email'));
             if (name && email) {
@@ -175,7 +175,7 @@
                     url: '/admin/users/update',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id, name: name, email: email}),
+                    data: JSON.stringify({seq: seq, name: name, email: email}),
                     success: loadAdminUsers
                 });
             }
@@ -188,9 +188,9 @@
                 for (var i = 0; i < list.length; i++) {
                     var u = list[i];
                     html += '<li>' + (u.userId || '') + ' / ' + (u.name || '') + ' / ' + (u.email || '') +
-                        ' <button class="btn btn-xs btn-warning admin-user-edit" data-id="' + u.id + '" data-name="' + (u.name || '') + '" data-email="' + (u.email || '') + '">수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-user-del" data-id="' + u.id + '">삭제</button>' +
-                        ' <button class="btn btn-xs btn-info admin-user-detail" data-id="' + u.id + '">상세</button>' + '</li>';
+                        ' <button class="btn btn-xs btn-warning admin-user-edit" data-user-seq="' + u.userSeq + '" data-name="' + (u.name || '') + '" data-email="' + (u.email || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-user-del" data-user-seq="' + u.userSeq + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-user-detail" data-user-seq="' + u.userSeq + '">상세</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-users').html(html);
@@ -198,13 +198,13 @@
         }
 
         $(document).on('click', '.admin-user-del', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('user-seq');
             if (confirm('회원을 삭제하시겠습니까?')) {
                 $.ajax({
                     url: '/admin/users/delete',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id}),
+                    data: JSON.stringify({seq: seq}),
                     success: loadAdminUsers
                 });
             }
@@ -212,8 +212,8 @@
 
         // 회원 상세보기 버튼 및 기능
         $(document).on('click', '.admin-user-detail', function () {
-            var id = $(this).data('id');
-            $.get('/admin/users/detail', {id: id}, function (u) {
+            var seq = $(this).data('user-seq');
+            $.get('/admin/users/detail', {seq: seq}, function (u) {
                 alert('아이디: ' + (u.userId || '') + '\n이름: ' + (u.name || '') + '\n이메일: ' + (u.email || ''));
             });
         });
@@ -224,10 +224,10 @@
                 var html = '<ul>';
                 for (var i = 0; i < list.length; i++) {
                     var o = list[i];
-                    html += '<li>주문번호: ' + (o.id || '') + ', 금액: ' + (o.totalPrice ? o.totalPrice.toLocaleString() : 0) + '원, 상태: ' + (o.status || '') +
-                        ' <button class="btn btn-xs btn-warning admin-order-edit" data-id="' + o.id + '" data-status="' + (o.status || '') + '">상태수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-order-del" data-id="' + o.id + '">삭제</button>' +
-                        ' <button class="btn btn-xs btn-info admin-order-detail" data-id="' + o.id + '">상세</button>' + '</li>';
+                    html += '<li>주문번호: ' + (o.orderSeq || '') + ', 금액: ' + (o.totalPrice ? o.totalPrice.toLocaleString() : 0) + '원, 상태: ' + (o.status || '') +
+                        ' <button class="btn btn-xs btn-warning admin-order-edit" data-order-seq="' + o.orderSeq + '" data-status="' + (o.status || '') + '">상태수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-order-del" data-order-seq="' + o.orderSeq + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-order-detail" data-order-seq="' + o.orderSeq + '">상세</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-orders').html(html);
@@ -235,19 +235,19 @@
         }
 
         // 주문 등록 폼 및 기능
-        $('#admin-orders').before('<div id="order-form"><input type="text" id="order-user-id" placeholder="회원아이디"><input type="number" id="order-total-price" placeholder="총금액"><input type="text" id="order-status" placeholder="상태"><button id="order-create" class="btn btn-sm btn-success">주문 등록</button></div>');
+        $('#admin-orders').before('<div id="order-form"><input type="text" id="order-user-seq" placeholder="회원번호"><input type="number" id="order-total-price" placeholder="총금액"><input type="text" id="order-status" placeholder="상태"><button id="order-create" class="btn btn-sm btn-success">주문 등록</button></div>');
         $('#order-create').click(function () {
-            var userId = $('#order-user-id').val();
+            var userSeq = $('#order-user-seq').val();
             var totalPrice = $('#order-total-price').val();
             var status = $('#order-status').val();
             $.ajax({
                 url: '/admin/orders/create',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({userId: userId, totalPrice: totalPrice, status: status}),
+                data: JSON.stringify({userId: userSeq, totalPrice: totalPrice, status: status}),
                 success: function () {
                     loadAdminOrders();
-                    $('#order-user-id').val('');
+                    $('#order-user-seq').val('');
                     $('#order-total-price').val('');
                     $('#order-status').val('');
                 }
@@ -255,27 +255,27 @@
         });
 
         $(document).on('click', '.admin-order-edit', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('order-seq');
             var status = prompt('주문 상태 수정', $(this).data('status'));
             if (status) {
                 $.ajax({
                     url: '/admin/orders/update',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id, status: status}),
+                    data: JSON.stringify({seq: seq, status: status}),
                     success: loadAdminOrders
                 });
             }
         });
 
         $(document).on('click', '.admin-order-del', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('order-seq');
             if (confirm('주문을 삭제하시겠습니까?')) {
                 $.ajax({
                     url: '/admin/orders/delete',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id}),
+                    data: JSON.stringify({seq: seq}),
                     success: loadAdminOrders
                 });
             }
@@ -287,10 +287,10 @@
                 var html = '<ul>';
                 for (var i = 0; i < list.length; i++) {
                     var o = list[i];
-                    html += '<li>주문번호: ' + (o.id || '') + ', 금액: ' + (o.totalPrice ? o.totalPrice.toLocaleString() : 0) + '원, 상태: ' + (o.status || '') +
-                        ' <button class="btn btn-xs btn-warning admin-order-edit" data-id="' + o.id + '" data-status="' + (o.status || '') + '">상태수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-order-del" data-id="' + o.id + '">삭제</button>' +
-                        ' <button class="btn btn-xs btn-info admin-order-detail" data-id="' + o.id + '">상세</button>' + '</li>';
+                    html += '<li>주문번호: ' + (o.orderSeq || '') + ', 금액: ' + (o.totalPrice ? o.totalPrice.toLocaleString() : 0) + '원, 상태: ' + (o.status || '') +
+                        ' <button class="btn btn-xs btn-warning admin-order-edit" data-order-seq="' + o.orderSeq + '" data-status="' + (o.status || '') + '">상태수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-order-del" data-order-seq="' + o.orderSeq + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-order-detail" data-order-seq="' + o.orderSeq + '">상세</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-orders').html(html);
@@ -303,10 +303,10 @@
                 var html = '<ul>';
                 for (var i = 0; i < list.length; i++) {
                     var p = list[i];
-                    html += '<li>결제번호: ' + (p.id || '') + ', 주문번호: ' + (p.orderId || '') + ', 금액: ' + (p.amount ? p.amount.toLocaleString() : 0) + '원, 상태: ' + (p.status || '') +
-                        ' <button class="btn btn-xs btn-warning admin-payment-edit" data-id="' + p.id + '" data-status="' + (p.status || '') + '">상태수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-payment-del" data-id="' + p.id + '">삭제</button>' +
-                        ' <button class="btn btn-xs btn-info admin-payment-detail" data-id="' + p.id + '">상세</button>' + '</li>';
+                    html += '<li>결제번호: ' + (p.paymentSeq || '') + ', 주문번호: ' + (p.orderSeq || '') + ', 금액: ' + (p.amount ? p.amount.toLocaleString() : 0) + '원, 상태: ' + (p.status || '') +
+                        ' <button class="btn btn-xs btn-warning admin-payment-edit" data-payment-seq="' + p.paymentSeq + '" data-status="' + (p.status || '') + '">상태수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-payment-del" data-payment-seq="' + p.paymentSeq + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-payment-detail" data-payment-seq="' + p.paymentSeq + '">상세</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-payments').html(html);
@@ -314,19 +314,19 @@
         }
 
         // 결제 등록/수정 폼 및 기능
-        $('#admin-payments').before('<div id="payment-form"><input type="number" id="payment-order-id" placeholder="주문번호"><input type="number" id="payment-amount" placeholder="금액"><input type="text" id="payment-status" placeholder="상태"><button id="payment-create" class="btn btn-sm btn-success">결제 등록</button></div>');
+        $('#admin-payments').before('<div id="payment-form"><input type="number" id="payment-order-seq" placeholder="주문번호"><input type="number" id="payment-amount" placeholder="금액"><input type="text" id="payment-status" placeholder="상태"><button id="payment-create" class="btn btn-sm btn-success">결제 등록</button></div>');
         $('#payment-create').click(function () {
-            var orderId = $('#payment-order-id').val();
+            var orderSeq = $('#payment-order-seq').val();
             var amount = $('#payment-amount').val();
             var status = $('#payment-status').val();
             $.ajax({
                 url: '/admin/payments/create',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({orderId: orderId, amount: amount, status: status}),
+                data: JSON.stringify({orderId: orderSeq, amount: amount, status: status}),
                 success: function () {
                     loadAdminPayments();
-                    $('#payment-order-id').val('');
+                    $('#payment-order-seq').val('');
                     $('#payment-amount').val('');
                     $('#payment-status').val('');
                 }
@@ -334,14 +334,14 @@
         });
 
         $(document).on('click', '.admin-payment-edit', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('payment-seq');
             var status = prompt('결제 상태 수정', $(this).data('status'));
             if (status) {
                 $.ajax({
                     url: '/admin/payments/update',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id, status: status}),
+                    data: JSON.stringify({seq: seq, status: status}),
                     success: loadAdminPayments
                 });
             }
@@ -354,9 +354,9 @@
                 for (var i = 0; i < list.length; i++) {
                     var r = list[i];
                     html += '<li>' + (r.productName || '') + ' / ' + (r.rating || '') + '점 / ' + (r.content || '') +
-                        ' <button class="btn btn-xs btn-warning admin-review-edit" data-id="' + r.id + '" data-rating="' + (r.rating || '') + '" data-content="' + (r.content || '') + '">수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-review-del" data-id="' + r.id + '">삭제</button>' +
-                        ' <button class="btn btn-xs btn-info admin-review-detail" data-id="' + r.id + '">상세</button>' + '</li>';
+                        ' <button class="btn btn-xs btn-warning admin-review-edit" data-review-seq="' + r.reviewSeq + '" data-rating="' + (r.rating || '') + '" data-content="' + (r.content || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-review-del" data-review-seq="' + r.reviewSeq + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-review-detail" data-review-seq="' + r.reviewSeq + '">상세</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-reviews').html(html);
@@ -384,7 +384,7 @@
         });
 
         $(document).on('click', '.admin-review-edit', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('review-seq');
             var rating = prompt('별점 수정(1~5)', $(this).data('rating'));
             var content = prompt('리뷰 내용 수정', $(this).data('content'));
             if (rating && content) {
@@ -392,7 +392,7 @@
                     url: '/admin/reviews/update',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id, rating: rating, content: content}),
+                    data: JSON.stringify({seq: seq, rating: rating, content: content}),
                     success: loadAdminReviews
                 });
             }
@@ -404,10 +404,10 @@
                 for (var i = 0; i < list.length; i++) {
                     var q = list[i];
                     html += '<li>' + (q.productName || '') + ' / ' + (q.question || '') + ' / 답변: ' + (q.answer || '-') +
-                        ' <button class="btn btn-xs btn-warning admin-qna-edit" data-id="' + q.id + '" data-question="' + (q.question || '') + '">수정</button>' +
-                        ' <button class="btn btn-xs btn-success qna-answer" data-id="' + q.id + '" data-answer="' + (q.answer || '') + '">답변등록/수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-qna-del" data-id="' + q.id + '">삭제</button>' +
-                        ' <button class="btn btn-xs btn-info admin-qna-detail" data-id="' + q.id + '">상세</button>' + '</li>';
+                        ' <button class="btn btn-xs btn-warning admin-qna-edit" data-qna-seq="' + q.qnaSeq + '" data-question="' + (q.question || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-success qna-answer" data-qna-seq="' + q.qnaSeq + '" data-answer="' + (q.answer || '') + '">답변등록/수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-qna-del" data-qna-seq="' + q.qnaSeq + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-qna-detail" data-qna-seq="' + q.qnaSeq + '">상세</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-qna').html(html);
@@ -415,14 +415,14 @@
         }
 
         $(document).on('click', '.qna-answer', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('qna-seq');
             var answer = prompt('답변 입력/수정', $(this).data('answer'));
             if (answer !== null) {
                 $.ajax({
                     url: '/qna/update',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id, answer: answer}),
+                    data: JSON.stringify({seq: seq, answer: answer}),
                     success: loadAdminQna
                 });
             }
@@ -447,14 +447,14 @@
         });
 
         $(document).on('click', '.admin-qna-edit', function () {
-            var id = $(this).data('id');
+            var seq = $(this).data('qna-seq');
             var question = prompt('문의 내용 수정', $(this).data('question'));
             if (question) {
                 $.ajax({
                     url: '/admin/qna/update',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({id: id, question: question}),
+                    data: JSON.stringify({seq: seq, question: question}),
                     success: loadAdminQna
                 });
             }
@@ -467,10 +467,10 @@
                 for (var i = 0; i < list.length; i++) {
                     var q = list[i];
                     html += '<li>' + (q.productName || '') + ' / ' + (q.question || '') + ' / 답변: ' + (q.answer || '-') +
-                        ' <button class="btn btn-xs btn-warning admin-qna-edit" data-id="' + q.id + '" data-question="' + (q.question || '') + '">수정</button>' +
-                        ' <button class="btn btn-xs btn-success qna-answer" data-id="' + q.id + '" data-answer="' + (q.answer || '') + '">답변등록/수정</button>' +
-                        ' <button class="btn btn-xs btn-danger admin-qna-del" data-id="' + q.id + '">삭제</button>' +
-                        ' <button class="btn btn-xs btn-info admin-qna-detail" data-id="' + q.id + '">상세</button>' + '</li>';
+                        ' <button class="btn btn-xs btn-warning admin-qna-edit" data-qna-seq="' + q.qnaSeq + '" data-question="' + (q.question || '') + '">수정</button>' +
+                        ' <button class="btn btn-xs btn-success qna-answer" data-qna-seq="' + q.qnaSeq + '" data-answer="' + (q.answer || '') + '">답변등록/수정</button>' +
+                        ' <button class="btn btn-xs btn-danger admin-qna-del" data-qna-seq="' + q.qnaSeq + '">삭제</button>' +
+                        ' <button class="btn btn-xs btn-info admin-qna-detail" data-qna-seq="' + q.qnaSeq + '">상세</button>' + '</li>';
                 }
                 html += '</ul>';
                 $('#admin-qna').html(html);
@@ -479,8 +479,8 @@
 
         // 문의 상세보기 버튼 및 기능
         $(document).on('click', '.admin-qna-detail', function () {
-            var id = $(this).data('id');
-            $.get('/admin/qna/detail', {id: id}, function (q) {
+            var seq = $(this).data('qna-seq');
+            $.get('/admin/qna/detail', {seq: seq}, function (q) {
                 alert('상품명: ' + (q.productName || '') + '\n질문: ' + (q.question || '') + '\n답변: ' + (q.answer || ''));
             });
         });

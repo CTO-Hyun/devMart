@@ -46,12 +46,12 @@
                 for (var i = 0; i < list.length; i++) {
                     var p = list[i];
                     html += '<tr>' +
-                        '<td>' + (p.id || '') + '</td>' +
-                        '<td>' + (p.orderId || '') + '</td>' +
+                        '<td>' + (p.paymentSeq || '') + '</td>' +
+                        '<td>' + (p.orderSeq || '') + '</td>' +
                         '<td>' + (p.amount ? p.amount.toLocaleString() : 0) + '원</td>' +
                         '<td>' + (p.status || '') + '</td>' +
                         '<td>' + (p.createDate || '') + '</td>' +
-                        '<td><button class="btn btn-xs btn-info payment-detail-btn" data-id="' + p.id + '">상세</button></td>' +
+                        '<td><button class="btn btn-xs btn-info payment-detail-btn" data-payment-seq="' + p.paymentSeq + '">상세</button></td>' +
                         '</tr>';
                 }
                 $('#payment-list').html(html);
@@ -59,11 +59,11 @@
         }
 
         $(document).on('click', '.payment-detail-btn', function () {
-            var paymentId = $(this).data('id');
-            $.get('/payment/detail', {paymentId: paymentId}, function (detail) {
+            var paymentSeq = $(this).data('payment-seq');
+            $.get('/payment/detail', {paymentSeq: paymentSeq}, function (detail) {
                 var html = '<ul>';
-                html += '<li>결제번호: ' + (detail.id || '') + '</li>';
-                html += '<li>주문번호: ' + (detail.orderId || '') + '</li>';
+                html += '<li>결제번호: ' + (detail.paymentSeq || '') + '</li>';
+                html += '<li>주문번호: ' + (detail.orderSeq || '') + '</li>';
                 html += '<li>결제금액: ' + (detail.amount ? detail.amount.toLocaleString() : 0) + '원</li>';
                 html += '<li>상태: ' + (detail.status || '') + '</li>';
                 html += '<li>결제일시: ' + (detail.createDate || '') + '</li>';
@@ -78,13 +78,13 @@
         });
 
         $('#payment-create-btn').on('click', function () {
-            var orderId = prompt('결제할 주문번호를 입력하세요.');
-            if (orderId) {
+            var orderSeq = prompt('결제할 주문번호를 입력하세요.');
+            if (orderSeq) {
                 $.ajax({
                     url: '/payment/create',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({orderId: orderId}),
+                    data: JSON.stringify({orderSeq: orderSeq}),
                     success: function () {
                         alert('결제가 완료되었습니다.');
                         loadPaymentList();

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -80,9 +82,10 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username);
         }
+        Long userSeq = user.get("userSeq") != null ? Long.parseLong(user.get("userSeq").toString()) : null;
         String password = (String) user.get("password");
-        Long id = user.get("id") != null ? Long.parseLong(user.get("id").toString()) : null;
-        List<org.springframework.security.core.GrantedAuthority> authorities = Collections.singletonList(() -> "ROLE_USER");
-        return new CustomUserDetails(id, username, password, authorities);
+        String role = (String) user.get("role");
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+        return new CustomUserDetails(userSeq, username, password, authorities);
     }
 }

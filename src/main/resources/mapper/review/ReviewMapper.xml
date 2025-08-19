@@ -9,14 +9,24 @@
     </select>
 
     <select id="selectReviewListByProduct" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT ID, USER_ID, USER_NAME, PRODUCT_ID, RATING, CONTENT, REG_DATE, UPD_DATE
-        FROM TB_REVIEW
-        WHERE PRODUCT_ID = #{productId}
-        ORDER BY REG_DATE DESC
-        <if test="limit != null and limit &gt; 0">
+        SELECT R.REVIEW_SEQ
+            , R.USER_SEQ
+            , R.USER_NAME
+            , R.PRODUCT_SEQ
+            , R.RATING
+            , R.CONTENT
+            , R.REG_DATE
+            , R.UPD_DATE
+            , P.NAME AS PRODUCT_NAME
+        FROM TB_REVIEW R
+            INNER JOIN TB_PRODUCT P
+                ON R.PRODUCT_SEQ = P.PRODUCT_SEQ
+        WHERE R.PRODUCT_SEQ = #{productSeq}
+        ORDER BY R.REG_DATE DESC
+        <if test="limit != null and limit > 0">
             LIMIT #{limit}
         </if>
-        <if test="offset != null and offset &gt;= 0">
+        <if test="offset != null and offset >= 0">
             OFFSET #{offset}
         </if>
     </select>
@@ -24,35 +34,37 @@
     <select id="selectReviewCountByProduct" resultType="int">
         SELECT COUNT(*)
         FROM TB_REVIEW
-        WHERE PRODUCT_ID = #{productId}
+        WHERE PRODUCT_SEQ = #{productSeq}
     </select>
 
-    <insert id="insertReview">
-        INSERT INTO TB_REVIEW ( PRODUCT_ID
-                              , USER_NAME
-                              , RATING
-                              , CONTENT
-                              , REG_DATE)
-        VALUES ( #{productId}
-               , #{userName}
-               , #{rating}
-               , #{content}
-               , NOW())
+    <insert id="insertReview" parameterType="map">
+        INSERT INTO TB_REVIEW ( PRODUCT_SEQ
+            , USER_SEQ
+            , USER_NAME
+            , RATING
+            , CONTENT
+            , REG_DATE)
+        VALUES ( #{productSeq}
+            , #{userSeq}
+            , #{userName}
+            , #{rating}
+            , #{content}
+            , NOW())
     </insert>
 
-    <update id="updateReview">
+    <update id="updateReview" parameterType="map">
         UPDATE TB_REVIEW
         SET RATING = #{rating}
-          , CONTENT = #{content}
-          , UPD_DATE = NOW()
-        WHERE ID = #{id}
-          AND USER_NAME = #{userName}
+            , CONTENT = #{content}
+            , UPD_DATE = NOW()
+        WHERE REVIEW_SEQ = #{reviewSeq}
+            AND USER_NAME = #{userName}
     </update>
 
-    <delete id="deleteReview">
+    <delete id="deleteReview" parameterType="map">
         DELETE
         FROM TB_REVIEW
-        WHERE ID = #{id}
-          AND USER_NAME = #{userName}
+        WHERE REVIEW_SEQ = #{reviewSeq}
+            AND USER_NAME = #{userName}
     </delete>
 </mapper>

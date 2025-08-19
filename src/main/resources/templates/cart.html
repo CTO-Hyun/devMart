@@ -24,14 +24,14 @@
         </thead>
         <tbody id="cart-list">
         <tr th:each="item : ${cartList}">
-            <td><a th:href="@{/product/detail(productId=${item['productId']})}" th:text="${item['productName']}"></a></td>
+            <td><a th:href="@{/product/detail(productSeq=${item['productSeq']})}" th:text="${item['productName']}"></a></td>
             <td>
-                <input type="number" min="1" name="quantity" th:value="${item['quantity']}" class="cart-qty-input" th:data-id="${item['cartId']}" style="width:60px;display:inline-block;"/>
+                <input type="number" min="1" name="quantity" th:value="${item['quantity']}" class="cart-qty-input" th:data-cart-seq="${item['cartSeq']}" style="width:60px;display:inline-block;"/>
             </td>
             <td class="cart-price" th:data-price="${item['price']}" th:text="${#numbers.formatInteger(item['price'], 0, 'COMMA')} + '원'"></td>
             <td class="cart-sum" th:text="${#numbers.formatInteger(item['price'] * item['quantity'], 0, 'COMMA')} + '원'"></td>
             <td>
-                <button class="btn btn-xs btn-danger cart-delete-btn" th:data-id="${item['cartId']}">삭제</button>
+                <button class="btn btn-xs btn-danger cart-delete-btn" th:data-cart-seq="${item['cartSeq']}">삭제</button>
             </td>
         </tr>
         <tr th:if="${#lists.isEmpty(cartList)}">
@@ -99,11 +99,11 @@
         var totalPrice = 0;
         document.querySelectorAll('.cart-qty-input').forEach(function(input) {
             var row = input.closest('tr');
-            var productId = row.querySelector('.cart-delete-btn').dataset.id;
+            var productSeq = row.querySelector('.cart-delete-btn').dataset.productSeq;
             var productName = row.querySelector('a').textContent; // 상품명 추가
             var qty = parseInt(input.value) || 0;
             var price = parseInt(row.querySelector('.cart-price').dataset.price) || 0;
-            items.push({ productId: productId, productName: productName, quantity: qty, price: price });
+            items.push({ productSeq: productSeq, productName: productName, quantity: qty, price: price });
             totalPrice += qty * price;
         });
         if(items.length === 0) {
@@ -130,12 +130,12 @@
     });
     // 장바구니 삭제
     $(document).on('click', '.cart-delete-btn', function() {
-        var id = this.dataset.id;
+        var cartSeq = this.dataset.cartSeq;
         $.ajax({
             url: '/cart/delete',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ id: id }),
+            data: JSON.stringify({ cartSeq: cartSeq }),
             success: function(res) {
                 if(res.success) location.reload();
                 else alert('삭제 실패: ' + (res.message || '서버 오류'));
@@ -147,13 +147,13 @@
     });
     // 장바구니 수량 변경
     $(document).on('change', '.cart-qty-input', function() {
-        var id = this.dataset.id;
+        var cartSeq = this.dataset.cartSeq;
         var qty = parseInt(this.value) || 0;
         $.ajax({
             url: '/cart/update',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ id: id, quantity: qty }),
+            data: JSON.stringify({ cartSeq: cartSeq, quantity: qty }),
             success: function(res) {
                 if(!res.success) alert('수량 변경 실패: ' + (res.message || '서버 오류'));
             },

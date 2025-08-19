@@ -3,38 +3,55 @@
 <mapper namespace="kr.co.devMart.mapper.PaymentMapper">
     <!-- 결제 내역 조회 -->
     <select id="selectPaymentListByUser" parameterType="map" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_ORDER_PAYMENT
-        WHERE ORDER_ID IN (SELECT ID FROM TB_ORDER WHERE USER_ID = #{userId})
+        SELECT ORDER_PAYMENT_SEQ
+            , ORDER_SEQ
+            , PAYMENT_TYPE
+            , PAYMENT_STATUS
+            , AMOUNT
+            , PAYMENT_DATE
+            , CREATE_DATE
+        FROM TB_ORDER_PAYMENT
+        WHERE ORDER_SEQ IN (SELECT ORDER_SEQ FROM TB_ORDER WHERE USER_SEQ = #{userSeq})
         ORDER BY CREATE_DATE DESC
     </select>
 
     <!-- 결제 단건 조회 -->
     <select id="selectPaymentDetail" parameterType="map" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT * FROM TB_ORDER_PAYMENT
-        WHERE ID = #{paymentId}
+        SELECT ORDER_PAYMENT_SEQ
+            , ORDER_SEQ
+            , PAYMENT_TYPE
+            , PAYMENT_STATUS
+            , AMOUNT
+            , PAYMENT_DATE
+            , CREATE_DATE
+        FROM TB_ORDER_PAYMENT
+        WHERE ORDER_PAYMENT_SEQ = #{orderPaymentSeq}
     </select>
 
     <!-- 결제 생성 -->
     <insert id="insertPayment" parameterType="map">
-        INSERT INTO TB_ORDER_PAYMENT ( ORDER_ID
-                                     , PAYMENT_TYPE
-                                     , PAYMENT_STATUS
-                                     , AMOUNT
-                                     , PAYMENT_DATE
-                                     , CREATE_DATE)
-        VALUES ( #{orderId}
-               , #{paymentType}
-               , #{paymentStatus}
-               , #{amount}
-               , #{paymentDate}
-               , NOW())
+        INSERT INTO TB_ORDER_PAYMENT ( ORDER_SEQ
+            , PAYMENT_TYPE
+            , PAYMENT_STATUS
+            , AMOUNT
+            , PAYMENT_DATE
+            , CREATE_DATE)
+        VALUES ( #{orderSeq}
+            , #{paymentType}
+            , #{paymentStatus}
+            , #{amount}
+            , #{paymentDate}
+            , NOW())
     </insert>
 
     <!-- 결제 상태 변경 -->
     <update id="updatePaymentStatus" parameterType="map">
         UPDATE TB_ORDER_PAYMENT
-        SET PAYMENT_STATUS = #{paymentStatus},
-            PAYMENT_DATE   = #{paymentDate}
-        WHERE ID = #{paymentId}
+        SET PAYMENT_STATUS = #{paymentStatus}
+            , PAYMENT_DATE = #{paymentDate}
+        WHERE ORDER_PAYMENT_SEQ = #{orderPaymentSeq}
     </update>
+    <delete id="deletePayment" parameterType="map">
+        DELETE FROM TB_ORDER_PAYMENT WHERE ORDER_PAYMENT_SEQ = #{orderPaymentSeq}
+    </delete>
 </mapper>

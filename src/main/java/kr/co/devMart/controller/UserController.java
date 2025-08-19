@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class UserController {
     // 회원가입
     @PostMapping("/signup")
     @ResponseBody
-    public Map<String, Object> signup(@RequestParam Map<String, Object> params) {
+    public Map<String, Object> signup(@RequestBody Map<String, Object> params) {
         userService.signup(params);
         Map<String, Object> res = new HashMap<>();
         res.put("success", true);

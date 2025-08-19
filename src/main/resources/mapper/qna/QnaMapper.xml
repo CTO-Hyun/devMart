@@ -8,48 +8,61 @@
     </select>
 
     <select id="selectQnaListByProduct" resultType="kr.co.devMart.common.util.CamelMap">
-        SELECT ID, USER_ID, USERNAME, PRODUCT_ID, QUESTION, ANSWER, IFNULL(IS_SECRET,0) AS isSecret, REG_DATE, UPD_DATE
-        FROM TB_QNA
-        WHERE PRODUCT_ID = #{productId}
-        ORDER BY REG_DATE DESC
-        <if test="limit != null and limit &gt; 0">
+        SELECT Q.QNA_SEQ
+            , Q.USER_SEQ
+            , Q.USERNAME
+            , Q.PRODUCT_SEQ
+            , Q.QUESTION
+            , Q.ANSWER
+            , IFNULL(Q.IS_SECRET,0) AS IS_SECRET
+            , Q.REG_DATE
+            , Q.UPD_DATE
+            , P.NAME AS PRODUCT_NAME
+        FROM TB_QNA Q
+            INNER JOIN TB_PRODUCT P
+                ON Q.PRODUCT_SEQ = P.PRODUCT_SEQ
+        WHERE Q.PRODUCT_SEQ = #{productSeq}
+        ORDER BY Q.REG_DATE DESC
+        <if test="limit != null and limit > 0">
             LIMIT #{limit}
         </if>
-        <if test="offset != null and offset &gt;= 0">
+        <if test="offset != null and offset >= 0">
             OFFSET #{offset}
         </if>
     </select>
 
     <select id="selectQnaCountByProduct" resultType="int">
-        SELECT COUNT(*) FROM TB_QNA WHERE PRODUCT_ID = #{productId}
+        SELECT COUNT(*) FROM TB_QNA WHERE PRODUCT_SEQ = #{productSeq}
     </select>
 
-    <insert id="insertQna">
-        INSERT INTO TB_QNA ( PRODUCT_ID
-                           , USERNAME
-                           , QUESTION
-                           , IS_SECRET
-                           , REG_DATE)
-        VALUES ( #{productId}
-               , #{username}
-               , #{question}
-               , #{isSecret}
-               , NOW())
+    <insert id="insertQna" parameterType="map">
+        INSERT INTO TB_QNA ( PRODUCT_SEQ
+            , USER_SEQ
+            , USERNAME
+            , QUESTION
+            , IS_SECRET
+            , REG_DATE)
+        VALUES ( #{productSeq}
+            , #{userSeq}
+            , #{username}
+            , #{question}
+            , #{isSecret}
+            , NOW())
     </insert>
 
-    <update id="updateQna">
+    <update id="updateQna" parameterType="map">
         UPDATE TB_QNA
-        SET QUESTION = #{question},
-            ANSWER = #{answer},
-            IS_SECRET = #{isSecret},
-            UPD_DATE = NOW()
-        WHERE ID = #{id}
-          AND USERNAME = #{username}
+        SET QUESTION = #{question}
+            , ANSWER = #{answer}
+            , IS_SECRET = #{isSecret}
+            , UPD_DATE = NOW()
+        WHERE QNA_SEQ = #{qnaSeq}
+            AND USERNAME = #{username}
     </update>
 
-    <delete id="deleteQna">
+    <delete id="deleteQna" parameterType="map">
         DELETE FROM TB_QNA
-        WHERE ID = #{id}
-          AND USERNAME = #{username}
+        WHERE QNA_SEQ = #{qnaSeq}
+            AND USERNAME = #{username}
     </delete>
 </mapper>

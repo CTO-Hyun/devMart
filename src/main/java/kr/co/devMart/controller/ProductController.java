@@ -51,22 +51,22 @@ public class ProductController {
 
     // 상품 상세 (파라미터 방식)
     @RequestMapping(value = "/product/detail", method = RequestMethod.GET)
-    public String productDetailParam(@RequestParam(value = "productId") Long productId, ModelMap modelMap) {
+    public String productDetailParam(@RequestParam(value = "productSeq") Long productSeq, ModelMap modelMap) {
         Map<String, Object> params = new HashMap<>();
-        params.put("id", productId);
+        params.put("productSeq", productSeq);
         Map<String, Object> product = productService.getProductById(params);
         if (product == null) {
             modelMap.addAttribute("errorMsg", "상품을 찾을 수 없습니다.");
             return "product/detail";
         }
-        // 로그인 사용자 userId 내려주기
+        // 로그인 사용자 userSeq 내려주기
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object principal = auth.getPrincipal();
-        Long loginUserId = 0L;
+        Long loginUserId = null;
         String loginUserName = "";
-        if (principal instanceof CustomUserDetails) {
-            loginUserId = ((CustomUserDetails) principal).getId();
-            loginUserName = ((CustomUserDetails) principal).getUsername();
+        if (principal instanceof kr.co.devMart.common.auth.CustomUserDetails) {
+            loginUserId = ((kr.co.devMart.common.auth.CustomUserDetails) principal).getUserSeq();
+            loginUserName = ((kr.co.devMart.common.auth.CustomUserDetails) principal).getUsername();
         }
         params.put("loginUserId", loginUserId);
         params.put("loginUserName", loginUserName);
@@ -80,20 +80,20 @@ public class ProductController {
     @RequestMapping(value = "/product/detail/{id}", method = RequestMethod.GET)
     public String productDetail(@PathVariable Long id, ModelMap modelMap) {
         Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
+        params.put("productSeq", id);
         Map<String, Object> product = productService.getProductById(params);
         if (product == null) {
             modelMap.addAttribute("errorMsg", "상품을 찾을 수 없습니다.");
             return "product/detail";
         }
-        // 로그인 사용자 userId 내려주기
+        // 로그인 사용자 userSeq 내려주기
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object principal = auth.getPrincipal();
-        Long loginUserId = 0L;
+        Long loginUserId = null;
         String loginUserName = "";
-        if (principal instanceof CustomUserDetails) {
-            loginUserId = ((CustomUserDetails) principal).getId();
-            loginUserName = ((CustomUserDetails) principal).getUsername();
+        if (principal instanceof kr.co.devMart.common.auth.CustomUserDetails) {
+            loginUserId = ((kr.co.devMart.common.auth.CustomUserDetails) principal).getUserSeq();
+            loginUserName = ((kr.co.devMart.common.auth.CustomUserDetails) principal).getUsername();
         }
         params.put("loginUserId", loginUserId);
         params.put("loginUserName", loginUserName);
@@ -136,7 +136,7 @@ public class ProductController {
     @RequestMapping(value = "/product/update/{id}", method = RequestMethod.GET)
     public String productUpdateForm(@PathVariable Long id, ModelMap modelMap) {
         Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
+        params.put("productSeq", id);
 
         Map<String, Object> product = productService.getProductById(params);
         modelMap.addAttribute("product", product);

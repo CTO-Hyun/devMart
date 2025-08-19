@@ -24,9 +24,9 @@
                         <p><strong th:class="${product.price < 50000} ? 'rainbow-text' : ''"
                                    th:text="${product.price < 0 ? '0 원' : #numbers.formatInteger(product.price, 0, 'COMMA') + ' 원'}"></strong>
                         </p>
-                        <button class="btn btn-sm btn-primary" type="button" th:onclick="|location.href='/product/detail?productId=' + ${product.id}|">상세보기</button>
+                        <button class="btn btn-sm btn-primary" type="button" th:onclick="|location.href='/product/detail?productSeq=' + ${product.productSeq}|">상세보기</button>
                         <button class="btn btn-sm btn-info add-to-cart-btn"
-                                th:attr="data-product-id=${product.id},data-product-name=${product.name},data-price=${product.price}"
+                                th:attr="data-product-seq=${product.productSeq},data-product-name=${product.name},data-price=${product.price}"
                                 type="button">
                             <i aria-hidden="true"
                                class="fa fa-shopping-cart"
@@ -47,14 +47,14 @@
 
         // 장바구니 담기 버튼 클릭 시 AJAX로 백엔드 호출
         $(document).on('click', '.add-to-cart-btn', function () {
-            var productId = $(this).data('product-id');
+            var productSeq = $(this).data('product-seq');
             var productName = $(this).data('product-name');
             var price = $(this).data('price');
             $.ajax({
                 url: '/cart/add',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({productId: productId, productName: productName, price: price, quantity: 1}),
+                data: JSON.stringify({productSeq: productSeq, productName: productName, price: price, quantity: 1}),
                 success: function () {
                     if (confirm('장바구니에 담았습니다. 장바구니로 이동하시겠습니까? (취소: 계속 쇼핑)')) {
                         window.location.href = '/cart.html';

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
@@ -100,8 +100,8 @@
             src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"></script>
 
     <script th:inline="javascript">
-        var productId = [[${product.id}]];
-        var loginUserId = Number(/*[[${loginUserId}]]*/ 0) || 0;
+        var productSeq = [[${product['productSeq']}]];
+        var loginUserId = /*[[${loginUserId}]]*/ null;
         var loginUserName = /*[['${loginUserName}']]*/ 'anonymousUser';
         if (!loginUserName || loginUserName === 'anonymousUser' || typeof loginUserName === 'undefined') loginUserName = '';
         console.log('loginUserId:', loginUserId, 'loginUserName:', loginUserName);
@@ -109,7 +109,7 @@
         var reviewPageSize = 10;
         function loadReviews(page) {
             page = page || 1;
-            $.get('/review/product', {productId: productId, page: page, size: reviewPageSize}, function (result) {
+            $.get('/review/product', {productSeq: productSeq, page: page, size: reviewPageSize}, function (result) {
                 var list = result.reviews;
                 if (!Array.isArray(list)) list = [];
                 var totalCount = result.totalCount || 0;
@@ -119,10 +119,10 @@
                 } else {
                     for (var i = 0; i < list.length; i++) {
                         var r = list[i];
-                        var isOwner = String(r.userId) === String(loginUserId);
+                        var isOwner = (loginUserId != null) && (String(r.userSeq) === String(loginUserId));
                         html += '<li style="margin-bottom:12px;">[' + (r.rating || '-') + '점] ' + (r.content || '-') + ' - ' + (r.userName || '-') +
-                            (isOwner ? ' <button class="btn btn-xs btn-warning review-edit" data-id="' + r.id + '" data-content="' + (r.content || '') + '" data-rating="' + (r.rating || '') + '">수정</button>' : '') +
-                            (isOwner ? ' <button class="btn btn-xs btn-danger review-del" data-id="' + r.id + '">삭제</button>' : '') + '</li>';
+                            (isOwner ? ' <button class="btn btn-xs btn-warning review-edit" data-review-seq="' + r.reviewSeq + '" data-content="' + (r.content || '') + '" data-rating="' + (r.rating || '') + '">수정</button>' : '') +
+                            (isOwner ? ' <button class="btn btn-xs btn-danger review-del" data-review-seq="' + r.reviewSeq + '">삭제</button>' : '') + '</li>';
                     }
                 }
                 html += '</ul>';
@@ -148,28 +148,28 @@
         });
 
         $(document).on('click', '.review-del', function () {
-            var id = $(this).data('id');
-            if (!id) return;
+            var reviewSeq = $(this).data('review-seq');
+            if (!reviewSeq) return;
             if (!confirm('리뷰를 삭제하시겠습니까?')) return;
             $.ajax({
                 url: '/review/delete',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({id: id}),
+                data: JSON.stringify({reviewSeq: reviewSeq}),
                 success: function () { loadReviews(1); },
                 error: function () { alert('리뷰 삭제 실패'); }
             });
         });
         $(document).on('click', '.review-edit', function () {
             var li = $(this).closest('li');
-            var id = $(this).data('id');
+            var reviewSeq = $(this).data('review-seq');
             var oldContent = $(this).data('content');
             var oldRating = $(this).data('rating');
             if (li.find('.review-edit-form').length > 0) return;
             var editForm = '<div class="review-edit-form" style="margin-top:8px;">'
                 + '<input type="number" min="1" max="5" class="form-control review-edit-rating" value="' + (oldRating || '') + '" style="width:80px;display:inline-block;"> '
                 + '<input type="text" class="form-control review-edit-content" value="' + (oldContent || '') + '" style="width:50%;display:inline-block;"> '
-                + '<button class="btn btn-xs btn-success review-edit-save" data-id="' + id + '">저장</button> '
+                + '<button class="btn btn-xs btn-success review-edit-save" data-review-seq="' + reviewSeq + '">저장</button> '
                 + '<button class="btn btn-xs btn-default review-edit-cancel">취소</button>'
                 + '</div>';
             li.append(editForm);
@@ -177,7 +177,7 @@
         });
         // 저장 버튼 클릭
         $(document).on('click', '.review-edit-save', function () {
-            var id = $(this).data('id');
+            var reviewSeq = $(this).data('review-seq');
             var li = $(this).closest('li');
             var rating = li.find('.review-edit-rating').val();
             var content = li.find('.review-edit-content').val();
@@ -186,7 +186,7 @@
                 url: '/review/update',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({id: id, rating: rating, content: content}),
+                data: JSON.stringify({reviewSeq: reviewSeq, rating: rating, content: content}),
                 success: function () { loadReviews(1); },
                 error: function () { alert('리뷰 수정 실패'); }
             });
@@ -199,23 +199,23 @@
         function loadQna(page) {
             page = page || 1;
             var pageSize = 10;
-            $.get('/qna/product', {productId: productId, page: page, size: pageSize}, function (result) {
+            $.get('/qna/product', {productSeq: productSeq, page: page, size: pageSize}, function (result) {
                 var list = result.qnaList;
                 if (!Array.isArray(list)) list = [];
                 var totalCount = result.totalCount || 0;
-                var html = '<ul style="padding-left:18px;">';
+                var html = '<ul>';
                 if (list.length === 0) {
                     html += '<li>문의가 없습니다.</li>';
                 } else {
                     for (var i = 0; i < list.length; i++) {
                         var q = list[i];
                         var isSecret = q.isSecret == 1;
-                        var isOwner = (loginUserId && q.userId == loginUserId) || (!q.userId && loginUserName && q.username === loginUserName);
+                        var isOwner = (loginUserId != null) && (String(q.userSeq) === String(loginUserId));
                         var isAdmin = loginUserName === 'admin';
                         var questionText = (isSecret && !(isOwner || isAdmin)) ? '<span style="color:#888;">비공개</span>' : (q.question || '');
                         html += '<li style="margin-bottom:12px;">' + questionText + ' / 답변: ' + (q.answer || '-') + ' - ' + (q.username || '') +
-                            (isOwner ? ' <button class="btn btn-xs btn-warning qna-edit" style="margin-left:6px;" data-id="' + q.id + '" data-question="' + (q.question || '') + '" data-secret="' + (q.isSecret || 0) + '">수정</button>' : '') +
-                            (isOwner ? ' <button class="btn btn-xs btn-danger qna-del" style="margin-left:2px;" data-id="' + q.id + '">삭제</button>' : '') + '</li>';
+                            (isOwner ? ' <button class="btn btn-xs btn-warning qna-edit" style="margin-left:6px;" data-qna-seq="' + q.qnaSeq + '" data-question="' + (q.question || '') + '" data-secret="' + (q.isSecret || 0) + '">수정</button>' : '') +
+                            (isOwner ? ' <button class="btn btn-xs btn-danger qna-del" style="margin-left:2px;" data-qna-seq="' + q.qnaSeq + '">삭제</button>' : '') + '</li>';
                     }
                 }
                 html += '</ul>';
@@ -241,27 +241,26 @@
         });
 
         $(document).on('click', '.qna-del', function () {
-            var id = $(this).data('id');
-            if (!id) return;
+            var qnaSeq = $(this).data('qna-seq');
+            if (!qnaSeq) return;
             if (!confirm('문의를 삭제하시겠습니까?')) return;
             $.ajax({
                 url: '/qna/delete',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({id: id}),
+                data: JSON.stringify({qnaSeq: qnaSeq}),
                 success: function () { loadQna(1); },
                 error: function () { alert('문의 삭제 실패'); }
             });
         });
         $(document).on('click', '.qna-edit', function () {
             var li = $(this).closest('li');
-            var id = $(this).data('id');
-            var oldQuestion = $(this).data('question');
+            var qnaSeq = $(this).data('qna-seq');
             // 이미 수정폼이 있으면 중복 생성 방지
             if (li.find('.qna-edit-form').length > 0) return;
             var editForm = '<div class="qna-edit-form" style="margin-top:8px; margin-bottom:4px;">'
                 + '<input type="text" class="form-control qna-edit-input" value="' + (oldQuestion || '') + '" style="width:60%;display:inline-block;"> '
-                + '<button class="btn btn-xs btn-success qna-edit-save" data-id="' + id + '">저장</button> '
+                + '<button class="btn btn-xs btn-success qna-edit-save" data-qna-seq="' + qnaSeq + '">저장</button> '
                 + '<button class="btn btn-xs btn-default qna-edit-cancel">취소</button>'
                 + '</div>';
             li.append(editForm);
@@ -269,7 +268,7 @@
         });
         // 저장 버튼 클릭
         $(document).on('click', '.qna-edit-save', function () {
-            var id = $(this).data('id');
+            var qnaSeq = $(this).data('qna-seq');
             var li = $(this).closest('li');
             var question = li.find('.qna-edit-input').val();
             if (!question) { alert('문의 내용을 입력하세요.'); return; }
@@ -277,7 +276,7 @@
                 url: '/qna/update',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({id: id, question: question}),
+                data: JSON.stringify({qnaSeq: qnaSeq, question: question}),
                 success: function () { loadQna(1); },
                 error: function () { alert('문의 수정 실패'); }
             });
@@ -289,7 +288,7 @@
         $('#review-submit').click(function () {
             var rating = $('#review-rating').val();
             var content = $('#review-content').val();
-            if (!productId || !rating || !content) {
+            if (!productSeq || !rating || !content) {
                 alert('상품, 별점, 내용을 모두 입력하세요.');
                 return;
             }
@@ -297,7 +296,7 @@
                 url: '/review/create',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ productId: productId, rating: rating, content: content }),
+                data: JSON.stringify({ productSeq: productSeq, rating: rating, content: content }),
                 success: function () {
                     alert('리뷰가 등록되었습니다.');
                     loadReviews(1);
@@ -310,14 +309,14 @@
             });
         });
         $('#qna-submit').click(function () {
-            var productId = [[${product.id}]];
+            var productSeq = [[${product.productSeq}]];
             var question = $('#qna-question').val();
             var isSecret = $('#qna-secret').is(':checked') ? 1 : 0;
             $.ajax({
                 url: '/qna/create',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({productId: productId, question: question, isSecret: isSecret}),
+                data: JSON.stringify({productSeq: productSeq, question: question, isSecret: isSecret}),
                 success: function () {
                     loadQna(1);
                     $('#qna-question').val('');
@@ -337,7 +336,7 @@
         });
         $(function () {
             // 리뷰 목록 무조건 보이게 (최소 동작)
-            $.get('/review/product', {productId: productId, page: 1, size: 10}, function(result) {
+            $.get('/review/product', {productSeq: productSeq, page: 1, size: 10}, function(result) {
                 var list = (result && Array.isArray(result.reviews)) ? result.reviews : [];
                 var html = '<ul>';
                 if (list.length === 0) {
@@ -345,18 +344,18 @@
                 } else {
                     for (var i = 0; i < list.length; i++) {
                         var r = list[i];
-                        console.log('리뷰 userId:', r.userId, 'isOwner:', String(r.userId) === String(loginUserId));
-                        var isOwner = loginUserId && String(r.userId) === String(loginUserId);
+                        console.log('리뷰 userId:', r.userSeq, 'isOwner:', String(r.userSeq) === String(loginUserId));
+                        var isOwner = (loginUserId != null) && (String(r.userSeq) === String(loginUserId));
                         html += '<li style="margin-bottom:12px;">[' + (r.rating || '-') + '점] ' + (r.content || '-') + ' - ' + (r.userName || '-') +
-                            (isOwner ? ' <button class="btn btn-xs btn-warning review-edit" data-id="' + r.id + '" data-content="' + (r.content || '') + '" data-rating="' + (r.rating || '') + '">수정</button>' : '') +
-                            (isOwner ? ' <button class="btn btn-xs btn-danger review-del" data-id="' + r.id + '">삭제</button>' : '') + '</li>';
+                            (isOwner ? ' <button class="btn btn-xs btn-warning review-edit" data-review-seq="' + r.reviewSeq + '" data-content="' + (r.content || '') + '" data-rating="' + (r.rating || '') + '">수정</button>' : '') +
+                            (isOwner ? ' <button class="btn btn-xs btn-danger review-del" data-review-seq="' + r.reviewSeq + '">삭제</button>' : '') + '</li>';
                     }
                 }
                 html += '</ul>';
                 $('#review-list').html(html);
             });
             // 문의 목록 무조건 보이게 (최소 동작)
-            $.get('/qna/product', {productId: productId, page: 1, size: 10}, function(result) {
+            $.get('/qna/product', {productSeq: productSeq, page: 1, size: 10}, function(result) {
                 var list = (result && Array.isArray(result.qnaList)) ? result.qnaList : [];
                 var html = '<ul>';
                 if (list.length === 0) {
@@ -364,14 +363,14 @@
                 } else {
                     for (var i = 0; i < list.length; i++) {
                         var q = list[i];
-                        console.log('문의 userId:', q.userId, 'isOwner:', String(q.userId) === String(loginUserId));
-                        var isOwner = loginUserId && String(q.userId) === String(loginUserId);
+                        console.log('문의 userId:', q.userSeq, 'isOwner:', String(q.userSeq) === String(loginUserId));
+                        var isOwner = (loginUserId != null) && (String(q.userSeq) === String(loginUserId));
                         var isSecret = q.isSecret == 1;
                         var isAdmin = loginUserName === 'admin';
                         var questionText = (isSecret && !(isOwner || isAdmin)) ? '<span style="color:#888;">비공개</span>' : (q.question || '');
                         html += '<li style="margin-bottom:12px;">' + questionText + ' / 답변: ' + (q.answer || '-') + ' - ' + (q.username || '') +
-                            (isOwner ? ' <button class="btn btn-xs btn-warning qna-edit" style="margin-left:6px;" data-id="' + q.id + '" data-question="' + (q.question || '') + '" data-secret="' + (q.isSecret || 0) + '">수정</button>' : '') +
-                            (isOwner ? ' <button class="btn btn-xs btn-danger qna-del" style="margin-left:2px;" data-id="' + q.id + '">삭제</button>' : '') + '</li>';
+                            (isOwner ? ' <button class="btn btn-xs btn-warning qna-edit" style="margin-left:6px;" data-qna-seq="' + q.qnaSeq + '" data-question="' + (q.question || '') + '" data-secret="' + (q.isSecret || 0) + '">수정</button>' : '') +
+                            (isOwner ? ' <button class="btn btn-xs btn-danger qna-del" style="margin-left:2px;" data-qna-seq="' + q.qnaSeq + '">삭제</button>' : '') + '</li>';
                     }
                 }
                 html += '</ul>';

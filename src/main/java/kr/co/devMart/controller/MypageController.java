@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 
 @RestController
 @RequestMapping("/mypage")
@@ -51,4 +53,13 @@ public class MypageController {
     }
 
     // 리뷰, Q&A 등은 추후 구현 예정
+}
+
+// 마이페이지 뷰 반환용 컨트롤러
+@Controller
+class MypagePageController {
+    @RequestMapping(value = "/mypage", method = RequestMethod.GET)
+    public String mypage(Model model) {
+        return "mypage";
+    }
 }

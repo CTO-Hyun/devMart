@@ -51,7 +51,7 @@ public class QnaController {
         if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
             params.put("username", auth.getName());
             if (principal instanceof CustomUserDetails) {
-                params.put("userId", ((CustomUserDetails) principal).getId());
+                params.put("userSeq", ((CustomUserDetails) principal).getUserSeq());
             }
         }
         int result = qnaService.addQna(params);
@@ -68,7 +68,7 @@ public class QnaController {
         if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
             params.put("username", auth.getName());
             if (principal instanceof CustomUserDetails) {
-                params.put("userId", ((CustomUserDetails) principal).getId());
+                params.put("userSeq", ((CustomUserDetails) principal).getUserSeq());
             }
         }
         int result = qnaService.updateQna(params);
@@ -83,7 +83,7 @@ public class QnaController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object principal = auth.getPrincipal();
         if (principal instanceof CustomUserDetails) {
-            params.put("userId", ((CustomUserDetails) principal).getId());
+            params.put("userSeq", ((CustomUserDetails) principal).getUserSeq());
         }
         int result = qnaService.deleteQna(params);
         Map<String, Object> res = new HashMap<>();

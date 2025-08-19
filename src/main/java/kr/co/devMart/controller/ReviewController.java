@@ -52,7 +52,7 @@ public class ReviewController {
         if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
             params.put("userName", auth.getName());
             if (principal instanceof CustomUserDetails) {
-                params.put("userId", ((CustomUserDetails) principal).getId());
+                params.put("userSeq", ((CustomUserDetails) principal).getUserSeq());
             }
         }
         int result = reviewService.addReview(params);
@@ -69,7 +69,7 @@ public class ReviewController {
         if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
             params.put("userName", auth.getName());
             if (principal instanceof CustomUserDetails) {
-                params.put("userId", ((CustomUserDetails) principal).getId());
+                params.put("userSeq", ((CustomUserDetails) principal).getUserSeq());
             }
         }
         return reviewService.updateReview(params);
@@ -81,7 +81,7 @@ public class ReviewController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object principal = auth.getPrincipal();
         if (principal instanceof CustomUserDetails) {
-            params.put("userId", ((CustomUserDetails) principal).getId());
+            params.put("userSeq", ((CustomUserDetails) principal).getUserSeq());
         }
         return reviewService.deleteReview(params);
     }

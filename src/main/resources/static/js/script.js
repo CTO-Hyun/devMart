@@ -37,14 +37,14 @@
 
         // 장바구니 담기 버튼 클릭 시 AJAX로 백엔드 호출
         $(document).on('click', '.cart-add-btn', function() {
-            var productId = $(this).data('product-id');
+            var productSeq = $(this).data('product-seq');
             var productName = $(this).data('product-name');
             var productPrice = $(this).data('product-price');
             $.ajax({
                 url: '/cart/add',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ productId: productId, quantity: 1 }),
+                data: JSON.stringify({ productSeq: productSeq, quantity: 1 }),
                 success: function() {
                     // 장바구니 정보 새로고침
                     updateCartSummary();
