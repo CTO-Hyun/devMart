@@ -3,27 +3,45 @@
       layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
-    <title>로그인 | DEVMART</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-    <link rel="stylesheet" th:href="@{/css/responsive.css}"/>
-    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <title>로그인 | devMart</title>
 </head>
 <body>
-<div class="container" style="max-width:400px;margin:100px auto 60px auto;" layout:fragment="content">
-    <h2 style="text-align:center; margin-bottom:30px;">로그인</h2>
-    <form method="post" th:action="@{/login}">
-        <div class="form-group" style="margin-bottom:20px;">
-            <label for="username">아이디</label>
-            <input autofocus class="form-control" id="username" name="username" required type="text"/>
+<section class="login-page" layout:fragment="content">
+    <div class="container">
+        <div class="login-shell">
+            <div class="login-benefit">
+                <span class="section-kicker">회원 전용 혜택</span>
+                <h1>주문, 리뷰, 문의까지 한 곳에서 관리하세요</h1>
+                <p>장바구니 상품을 이어서 확인하고 구매 내역과 문의 답변을 빠르게 조회할 수 있습니다.</p>
+                <ul>
+                    <li><i class="fa fa-check"></i> 안전한 계정 기반 주문 관리</li>
+                    <li><i class="fa fa-check"></i> 리뷰와 Q&A 작성 내역 보관</li>
+                    <li><i class="fa fa-check"></i> 관리자 상품/주문 운영 지원</li>
+                </ul>
+            </div>
+            <div class="login-card">
+                <h2>로그인</h2>
+                <p class="login-subtitle">devMart 계정으로 계속 진행합니다.</p>
+                <div class="alert alert-danger" th:if="${param.error}">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+                <div class="alert alert-success" th:if="${param.logout}">로그아웃되었습니다.</div>
+                <form method="post" th:action="@{/login}">
+                    <div class="form-group">
+                        <label for="username">아이디</label>
+                        <input autofocus class="form-control" id="username" name="username" required type="text" autocomplete="username"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">비밀번호</label>
+                        <input class="form-control" id="password" name="password" required type="password" autocomplete="current-password"/>
+                    </div>
+                    <button class="btn btn-theme btn-login" type="submit">로그인</button>
+                </form>
+                <div class="login-actions">
+                    <a th:href="@{/signup}">회원가입</a>
+                    <a th:href="@{/product/list}">비회원으로 상품 보기</a>
+                </div>
+            </div>
         </div>
-        <div class="form-group" style="margin-bottom:20px;">
-            <label for="password">비밀번호</label>
-            <input class="form-control" id="password" name="password" required type="password"/>
-        </div>
-        <div class="alert alert-danger" style="margin-bottom:15px;" th:if="${param.error}">아이디 또는 비밀번호가 올바르지 않습니다.</div>
-        <button class="btn btn-primary btn-block" style="width:100%;" type="submit">로그인</button>
-    </form>
-</div>
+    </div>
+</section>
 </body>
 </html>

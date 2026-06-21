@@ -17,6 +17,24 @@ import kr.co.devMart.common.auth.CustomUserDetails;
 public class ProductController {
 
     private final ProductService productService;
+    private static final List<Map<String, String>> PRODUCT_CATEGORIES = List.of(
+            Map.of("code", "", "name", "전체"),
+            Map.of("code", "WOMEN", "name", "여성복"),
+            Map.of("code", "MEN", "name", "남성복"),
+            Map.of("code", "SHOES", "name", "신발"),
+            Map.of("code", "BAG", "name", "가방"),
+            Map.of("code", "ACC", "name", "악세사리"),
+            Map.of("code", "KIDS", "name", "아동"),
+            Map.of("code", "SPORTS", "name", "운동복"),
+            Map.of("code", "ETC", "name", "기타")
+    );
+    private static final Map<String, String> SORT_COLUMNS = Map.of(
+            "new", "CREATE_DATE",
+            "popular", "SELL_COUNT",
+            "rating", "RATING",
+            "priceLow", "PRICE",
+            "priceHigh", "PRICE"
+    );
 
     @Autowired
     public ProductController(ProductService productService) {
@@ -26,27 +44,34 @@ public class ProductController {
     // 상품 목록
     @RequestMapping(value = "/product/{path}", method = RequestMethod.GET)
     public void productList(@PathVariable String path, ModelMap modelMap, @RequestParam Map<String, Object> params) {
-        if (params.get("categoryType") == null) {
-            params.put("title", "전체");
-        } else if (params.get("categoryType").equals("ACC")) {
-            params.put("title", "악세사리");
-        } else if (params.get("categoryType").equals("BAG")) {
-            params.put("title", "가방");
-        } else if (params.get("categoryType").equals("ETC")) {
-            params.put("title", "기타");
-        } else if (params.get("categoryType").equals("KIDS")) {
-            params.put("title", "아동");
-        } else if (params.get("categoryType").equals("MEN")) {
-            params.put("title", "남성복");
-        } else if (params.get("categoryType").equals("SHOES")) {
-            params.put("title", "신발");
-        } else if (params.get("categoryType").equals("SPORTS")) {
-            params.put("title", "운동복");
-        } else if (params.get("categoryType").equals("WOMEN")) {
-            params.put("title", "여성복");
+        String categoryType = String.valueOf(params.getOrDefault("categoryType", ""));
+        params.put("title", getCategoryName(categoryType));
+        applySafeSort(params);
+        int page = parsePositiveInt(params.get("page"), 1);
+        int size = parsePositiveInt(params.get("size"), 40);
+        int totalCount = productService.getProductCount(params);
+        int totalPages = Math.max((int) Math.ceil((double) totalCount / size), 1);
+        if (page > totalPages) {
+            page = totalPages;
         }
+        params.put("page", page);
+        params.put("size", size);
+        params.put("limit", size);
+        params.put("offset", (page - 1) * size);
+        int pageBlockSize = 10;
+        int startPage = ((page - 1) / pageBlockSize) * pageBlockSize + 1;
+        int endPage = Math.min(startPage + pageBlockSize - 1, totalPages);
         modelMap.addAttribute("params", params);
+        modelMap.addAttribute("categories", PRODUCT_CATEGORIES);
+        modelMap.addAttribute("currentCategory", categoryType);
+        modelMap.addAttribute("currentSort", params.get("sort"));
+        modelMap.addAttribute("currentSearchKeyword", String.valueOf(params.getOrDefault("searchKeyword", "")));
         modelMap.addAttribute("products", productService.getProductList(params));
+        modelMap.addAttribute("totalCount", totalCount);
+        modelMap.addAttribute("currentPage", page);
+        modelMap.addAttribute("totalPages", totalPages);
+        modelMap.addAttribute("startPage", startPage);
+        modelMap.addAttribute("endPage", endPage);
     }
 
     // 상품 상세 (파라미터 방식)
@@ -73,6 +98,7 @@ public class ProductController {
         modelMap.addAttribute("loginUserId", loginUserId);
         modelMap.addAttribute("loginUserName", loginUserName);
         modelMap.addAttribute("product", product);
+        modelMap.addAttribute("categories", PRODUCT_CATEGORIES);
         return "product/detail";
     }
 
@@ -100,6 +126,7 @@ public class ProductController {
         modelMap.addAttribute("loginUserId", loginUserId);
         modelMap.addAttribute("loginUserName", loginUserName);
         modelMap.addAttribute("product", product);
+        modelMap.addAttribute("categories", PRODUCT_CATEGORIES);
         return "product/detail";
     }
 
@@ -214,5 +241,35 @@ public class ProductController {
     @RequestMapping(value = "/main", method = RequestMethod.GET)
     public String priorOrderPlnPopup(@RequestParam Map<String, Object> params) {
         return "main/main";
+    }
+
+    private String getCategoryName(String categoryType) {
+        return PRODUCT_CATEGORIES.stream()
+                .filter(category -> category.get("code").equals(categoryType))
+                .findFirst()
+                .map(category -> category.get("name"))
+                .orElse("전체");
+    }
+
+    private void applySafeSort(Map<String, Object> params) {
+        String sort = String.valueOf(params.getOrDefault("sort", "new"));
+        if (!SORT_COLUMNS.containsKey(sort)) {
+            sort = "new";
+        }
+        params.put("sort", sort);
+        params.put("sortBy", SORT_COLUMNS.get(sort));
+        params.put("sortOrder", "priceLow".equals(sort) ? "ASC" : "DESC");
+    }
+
+    private int parsePositiveInt(Object value, int defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            int parsed = Integer.parseInt(value.toString());
+            return parsed > 0 ? parsed : defaultValue;
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package kr.co.devMart.controller;
 
 import kr.co.devMart.service.CartService;
+import kr.co.devMart.common.auth.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,9 +25,9 @@ public class CartPageController {
     @RequestMapping(value = "/cart.html", method = RequestMethod.GET)
     public String cartPage(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userId = auth.getName();
+        Long userSeq = currentUserSeq(auth);
         Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
+        params.put("userSeq", userSeq);
         List<Map<String, Object>> cartList = cartService.getCartListByUser(params);
         int totalCount = 0;
         int totalPrice = 0;
@@ -44,5 +45,16 @@ public class CartPageController {
         model.addAttribute("cartCount", totalCount);
         model.addAttribute("cartTotal", totalPrice);
         return "cart";
+    }
+
+    private Long currentUserSeq(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return null;
+        }
+        Object principal = auth.getPrincipal();
+        if (principal instanceof CustomUserDetails userDetails) {
+            return userDetails.getUserSeq();
+        }
+        return null;
     }
 }

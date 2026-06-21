@@ -19,14 +19,15 @@ spring:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     url: jdbc:log4jdbc:mysql://localhost:3306/devmart?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: root
-    password: root1234
+    password: 123123
     hikari:
       connection-timeout: 3000
       validation-timeout: 1000
-      max-lifetime: 50000
-      idle-timeout: 50000
-      keepalive-time: 30000
-      maximum-pool-size: 1
+      max-lifetime: 1800000
+      idle-timeout: 600000
+      keepalive-time: 300000
+      minimum-idle: 2
+      maximum-pool-size: 10
   web:
     resources:
       chain:
@@ -44,7 +45,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info
 
 mybatis:
   mapper-locations: classpath*:mapper/**/**/*.xml
@@ -78,13 +79,13 @@ api:
 
 logging:
   level:
-    kr.co.devMart.mapper: DEBUG
-    org.mybatis: DEBUG
-    org.springframework.jdbc: DEBUG
-    org.springframework.transaction: DEBUG
-    jdbc.sqlonly: INFO
-    jdbc.sqltiming: INFO
+    kr.co.devMart.mapper: INFO
+    org.mybatis: INFO
+    org.springframework.jdbc: WARN
+    org.springframework.transaction: WARN
+    jdbc.sqlonly: OFF
+    jdbc.sqltiming: OFF
     jdbc.audit: OFF
     jdbc.resultset: OFF
-    jdbc.resultsettable: INFO
+    jdbc.resultsettable: OFF
     jdbc.connection: OFF

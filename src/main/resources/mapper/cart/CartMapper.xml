@@ -13,6 +13,18 @@
             INNER JOIN TB_PRODUCT P
                 ON C.PRODUCT_SEQ = P.PRODUCT_SEQ
         WHERE C.USER_SEQ = #{userSeq}
+        ORDER BY C.CREATE_DATE DESC, C.CART_SEQ DESC
+    </select>
+
+    <select id="selectCartItem" parameterType="map" resultType="kr.co.devMart.common.util.CamelMap">
+        SELECT CART_SEQ
+            , USER_SEQ
+            , PRODUCT_SEQ
+            , QUANTITY
+        FROM TB_CART
+        WHERE USER_SEQ = #{userSeq}
+            AND PRODUCT_SEQ = #{productSeq}
+        LIMIT 1
     </select>
 
     <insert id="insertCart" parameterType="map">
@@ -26,15 +38,26 @@
             , NOW())
     </insert>
 
+    <update id="increaseCartQuantity" parameterType="map">
+        UPDATE TB_CART
+        SET QUANTITY = QUANTITY + #{quantity}
+            , UPDATE_DATE = NOW()
+        WHERE CART_SEQ = #{cartSeq}
+            AND USER_SEQ = #{userSeq}
+    </update>
+
     <update id="updateCartQuantity" parameterType="map">
         UPDATE TB_CART
         SET QUANTITY = #{quantity}
             , UPDATE_DATE = NOW()
         WHERE CART_SEQ = #{cartSeq}
+            AND USER_SEQ = #{userSeq}
     </update>
 
     <delete id="deleteCart" parameterType="map">
-        DELETE FROM TB_CART WHERE CART_SEQ = #{cartSeq}
+        DELETE FROM TB_CART
+        WHERE CART_SEQ = #{cartSeq}
+            AND USER_SEQ = #{userSeq}
     </delete>
 
     <delete id="deleteCartByUser" parameterType="map">

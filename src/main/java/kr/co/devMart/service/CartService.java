@@ -23,6 +23,11 @@ public class CartService {
 
     // 장바구니 추가
     public int addCart(Map<String, Object> params) {
+        Map<String, Object> existingCart = cartMapper.selectCartItem(params);
+        if (existingCart != null) {
+            params.put("cartSeq", existingCart.get("cartSeq"));
+            return cartMapper.increaseCartQuantity(params);
+        }
         return cartMapper.insertCart(params);
     }
 

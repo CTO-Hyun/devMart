@@ -2,91 +2,149 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{layout/default}">
 <head>
-    <title>devMart</title>
+    <title th:text="${params.title + ' 상품 | devMart'}">상품 목록 | devMart</title>
     <meta charset="UTF-8">
 </head>
 <body>
-<section class="content" layout:fragment="content">
-    <div class="container">
-        <h3 class="page-header">[[${params.title}]] 목록</h3>
-        <div class="row">
-            <div class="product-box" th:each="product : ${products}">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title" th:text="${product.name}"></h3>
-                    </div>
-                    <div class="panel-body text-center">
-                        <div class="product-image-wrapper">
-                            <img alt="상품 이미지"
-                                 onerror="this.src='/images/preparing.png'" th:src="@{${product.imageUrl}}"/>
-                        </div>
+<section class="content product-list-page" layout:fragment="content">
+    <div class="product-list-hero">
+        <div class="container">
+            <span class="section-kicker">devMart collection</span>
+            <h1 th:text="${params.title + ' 상품'}">전체 상품</h1>
+            <p>지금 많이 찾는 상품을 카테고리별로 비교하고 바로 장바구니에 담아보세요.</p>
+        </div>
+    </div>
 
-                        <p><strong th:class="${product.price < 50000} ? 'rainbow-text' : ''"
-                                   th:text="${product.price < 0 ? '0 원' : #numbers.formatInteger(product.price, 0, 'COMMA') + ' 원'}"></strong>
-                        </p>
-                        <button class="btn btn-sm btn-primary" type="button" th:onclick="|location.href='/product/detail?productSeq=' + ${product.productSeq}|">상세보기</button>
-                        <button class="btn btn-sm btn-info add-to-cart-btn"
+    <div class="container">
+        <div class="catalog-toolbar">
+            <div>
+                <strong th:text="${#numbers.formatInteger(totalCount, 0, 'COMMA')}">0</strong>
+                <span>개의 상품</span>
+                <span class="catalog-search-label" th:if="${currentSearchKeyword != null and currentSearchKeyword != ''}"
+                      th:text="${'검색어: ' + currentSearchKeyword}">검색어</span>
+            </div>
+            <div class="catalog-sort">
+                <a th:classappend="${currentSort == 'new'} ? ' active' : ''"
+                   th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort='new')}">신상품</a>
+                <a th:classappend="${currentSort == 'popular'} ? ' active' : ''"
+                   th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort='popular')}">인기순</a>
+                <a th:classappend="${currentSort == 'rating'} ? ' active' : ''"
+                   th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort='rating')}">평점순</a>
+                <a th:classappend="${currentSort == 'priceLow'} ? ' active' : ''"
+                   th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort='priceLow')}">낮은가격</a>
+                <a th:classappend="${currentSort == 'priceHigh'} ? ' active' : ''"
+                   th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort='priceHigh')}">높은가격</a>
+            </div>
+        </div>
+
+        <div class="catalog-grid" th:if="${products != null and !#lists.isEmpty(products)}">
+            <article class="commerce-product-card" th:each="product, stat : ${products}">
+                <a class="product-media" th:href="@{/product/detail(productSeq=${product.productSeq})}">
+                    <span class="product-rank" th:if="${stat.index < 3}" th:text="${'BEST ' + (stat.index + 1)}">BEST 1</span>
+                    <span class="product-sale" th:if="${product.discountRate != null and product.discountRate > 0}"
+                          th:text="${product.discountRate + '%'}">10%</span>
+                    <img alt="상품 이미지" onerror="this.src='/images/preparing.png'" th:src="@{${product.imageUrl}}"/>
+                </a>
+                <div class="commerce-product-body">
+                    <div class="product-meta-line">
+                        <span th:text="${product.brand ?: 'devMart'}">devMart</span>
+                        <span th:if="${product.rating != null}"><i class="fa fa-star"></i> [[${product.rating}]]</span>
+                    </div>
+                    <a class="commerce-product-title" th:href="@{/product/detail(productSeq=${product.productSeq})}"
+                       th:text="${product.name}">상품명</a>
+                    <p class="commerce-product-desc" th:text="${product.description ?: '매일 입기 좋은 데일리 셀렉션입니다.'}">상품 설명</p>
+                    <div class="commerce-product-price">
+                        <strong th:text="${product.price < 0 ? '0원' : #numbers.formatInteger(product.price, 0, 'COMMA') + '원'}">0원</strong>
+                        <span th:if="${product.sellCount != null}" th:text="${#numbers.formatInteger(product.sellCount, 0, 'COMMA') + '개 판매'}">0개 판매</span>
+                    </div>
+                    <div class="commerce-product-tags">
+                        <span th:if="${product.stock != null and product.stock <= 5 and product.stock > 0}">품절임박</span>
+                        <span th:if="${product.stock != null and product.stock <= 0}">일시품절</span>
+                        <span th:if="${product.tags != null}" th:text="${product.tags}">태그</span>
+                    </div>
+                    <div class="commerce-product-actions">
+                        <a class="btn btn-line" th:href="@{/product/detail(productSeq=${product.productSeq})}">상세보기</a>
+                        <button class="btn btn-theme add-to-cart-btn"
                                 th:attr="data-product-seq=${product.productSeq},data-product-name=${product.name},data-price=${product.price}"
                                 type="button">
-                            <i aria-hidden="true"
-                               class="fa fa-shopping-cart"
-                               style="font-size: 1.7em; line-height: 0.75em; vertical-align: -15%;"></i>
+                            <i class="fa-shopping-cart" aria-hidden="true"></i>
+                            <span>장바구니 담기</span>
                         </button>
                     </div>
                 </div>
-            </div>
+            </article>
         </div>
+
+        <div class="catalog-empty" th:if="${products == null or #lists.isEmpty(products)}">
+            <i class="fa fa-search"></i>
+            <h2>조건에 맞는 상품이 없습니다</h2>
+            <p>다른 카테고리나 정렬 조건으로 다시 확인해 주세요.</p>
+            <a th:href="@{/product/list}" class="btn btn-theme">전체 상품 보기</a>
+        </div>
+
+        <nav class="catalog-pagination" th:if="${totalPages > 1}" aria-label="상품 페이지">
+            <a th:classappend="${currentPage == 1} ? ' disabled' : ''"
+               th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort=${currentSort}, page=${currentPage - 1})}">
+                <i class="fa fa-angle-left"></i>
+            </a>
+            <a th:if="${startPage > 1}"
+               th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort=${currentSort}, page=1)}">1</a>
+            <span class="page-gap" th:if="${startPage > 2}">...</span>
+            <a th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
+               th:classappend="${pageNumber == currentPage} ? ' active' : ''"
+               th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort=${currentSort}, page=${pageNumber})}"
+               th:text="${pageNumber}">1</a>
+            <span class="page-gap" th:if="${endPage < totalPages - 1}">...</span>
+            <a th:if="${endPage < totalPages}"
+               th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort=${currentSort}, page=${totalPages})}"
+               th:text="${totalPages}">1</a>
+            <a th:classappend="${currentPage == totalPages} ? ' disabled' : ''"
+               th:href="@{/product/list(categoryType=${currentCategory}, searchKeyword=${currentSearchKeyword}, sort=${currentSort}, page=${currentPage + 1})}">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        </nav>
     </div>
+
     <script th:inline="javascript">
-        // 페이지 로드 시 장바구니 정보 갱신
         $(function () {
             if (typeof updateCartSummary === 'function') {
                 updateCartSummary();
             }
         });
 
-        // 장바구니 담기 버튼 클릭 시 AJAX로 백엔드 호출
         $(document).on('click', '.add-to-cart-btn', function () {
+            var $button = $(this);
             var productSeq = $(this).data('product-seq');
             var productName = $(this).data('product-name');
             var price = $(this).data('price');
+            $button.prop('disabled', true).addClass('is-loading');
             $.ajax({
                 url: '/cart/add',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({productSeq: productSeq, productName: productName, price: price, quantity: 1}),
-                success: function () {
-                    if (confirm('장바구니에 담았습니다. 장바구니로 이동하시겠습니까? (취소: 계속 쇼핑)')) {
-                        window.location.href = '/cart.html';
+                success: function (result) {
+                    if (!result || result.success !== true) {
+                        alert(result && result.message === 'LOGIN_REQUIRED' ? '로그인 후 장바구니를 이용할 수 있습니다.' : '장바구니에 담지 못했습니다. 잠시 후 다시 시도해 주세요.');
+                        if (result && result.message === 'LOGIN_REQUIRED') window.location.href = '/login';
+                        return;
+                    }
+                    if (typeof updateCartSummary === 'function') updateCartSummary();
+                    if (typeof showCartToast === 'function') {
+                        showCartToast('장바구니에 담았습니다.');
                     }
                 },
-                error: function () {
-                    alert('장바구니 담기 실패');
+                error: function (xhr) {
+                    var message = xhr.responseJSON && xhr.responseJSON.message;
+                    alert(message === 'LOGIN_REQUIRED' ? '로그인 후 장바구니를 이용할 수 있습니다.' : '장바구니에 담지 못했습니다. 잠시 후 다시 시도해 주세요.');
+                    if (xhr.status === 401 || message === 'LOGIN_REQUIRED') window.location.href = '/login';
+                },
+                complete: function () {
+                    $button.prop('disabled', false).removeClass('is-loading');
                 }
             });
         });
-
-        // 장바구니 개수/금액 요약 정보 갱신
-        function updateCartSummary() {
-            $.ajax({
-                url: '/cart/list',
-                type: 'GET',
-                success: function (cartList) {
-                    var totalCount = 0;
-                    var totalPrice = 0;
-                    for (var i = 0; i < cartList.length; i++) {
-                        totalCount += cartList[i].quantity;
-                        totalPrice += (cartList[i].quantity * cartList[i].price || 0);
-                    }
-                    $(".cart-text").html('장바구니<br>' + totalCount + ' 건 - ' + totalPrice.toLocaleString() + '원');
-                },
-                error: function () {
-                    $(".cart-text").html('장바구니<br>0 건 - 0원');
-                }
-            });
-        }
     </script>
 </section>
-
 </body>
 </html>

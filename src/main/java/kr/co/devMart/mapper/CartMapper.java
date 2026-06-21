@@ -9,7 +9,11 @@ import java.util.Map;
 public interface CartMapper {
     List<Map<String, Object>> selectCartListByUser(Map<String, Object> params);
 
+    Map<String, Object> selectCartItem(Map<String, Object> params);
+
     int insertCart(Map<String, Object> params);
+
+    int increaseCartQuantity(Map<String, Object> params);
 
     int updateCartQuantity(Map<String, Object> params);
 

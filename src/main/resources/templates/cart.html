@@ -4,165 +4,172 @@
 <head>
     <meta charset="UTF-8">
     <title>장바구니 | devMart</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}"/>
-    <link rel="stylesheet" th:href="@{/css/responsive.css}"/>
-    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
-          rel="stylesheet">
 </head>
 <body>
-<div class="container" style="max-width:900px;margin:60px auto;" layout:fragment="content">
-    <h2 style="text-align:center; margin-bottom:30px;">장바구니</h2>
-    <table class="table table-bordered table-hover">
-        <thead>
-        <tr>
-            <th>상품명</th>
-            <th>수량</th>
-            <th>가격</th>
-            <th>합계</th>
-            <th>삭제</th>
-        </tr>
-        </thead>
-        <tbody id="cart-list">
-        <tr th:each="item : ${cartList}">
-            <td><a th:href="@{/product/detail(productSeq=${item['productSeq']})}" th:text="${item['productName']}"></a></td>
-            <td>
-                <input type="number" min="1" name="quantity" th:value="${item['quantity']}" class="cart-qty-input" th:data-cart-seq="${item['cartSeq']}" style="width:60px;display:inline-block;"/>
-            </td>
-            <td class="cart-price" th:data-price="${item['price']}" th:text="${#numbers.formatInteger(item['price'], 0, 'COMMA')} + '원'"></td>
-            <td class="cart-sum" th:text="${#numbers.formatInteger(item['price'] * item['quantity'], 0, 'COMMA')} + '원'"></td>
-            <td>
-                <button class="btn btn-xs btn-danger cart-delete-btn" th:data-cart-seq="${item['cartSeq']}">삭제</button>
-            </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(cartList)}">
-            <td colspan="5" style="text-align:center; color:#888;">장바구니가 비어있습니다.</td>
-        </tr>
-        <tr th:if="${not #lists.isEmpty(cartList)}">
-            <td colspan="5" style="text-align:right;">
-                <span id="cart-summary-total">총 <span id="cart-total-count">0</span>건 / <span id="cart-total-price">0</span>원</span>
-            </td>
-        </tr>
-        </tbody>
-        <tfoot>
-        <tr th:if="${not #lists.isEmpty(cartList)}">
-            <td colspan="5" style="text-align:right;">
-                <button type="button" class="btn btn-danger" id="cart-clear-btn">장바구니 전체 비우기</button>
-                <button type="button" class="btn btn-primary" id="cart-order-btn" style="margin-left:10px;">장바구니 전체 구매</button>
-            </td>
-        </tr>
-        </tfoot>
-    </table>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    function updateCartSummary() {
-        var totalCount = 0, totalPrice = 0;
-        document.querySelectorAll('.cart-qty-input').forEach(function(input) {
-            var row = input.closest('tr');
-            var qty = parseInt(input.value) || 0;
-            var price = parseInt(row.querySelector('.cart-price').dataset.price) || 0;
-            totalCount += qty;
-            totalPrice += qty * price;
-        });
-        document.getElementById('cart-total-count').textContent = totalCount;
-        document.getElementById('cart-total-price').textContent = totalPrice.toLocaleString();
-    }
-    $(document).on('input', '.cart-qty-input', function() {
-        var row = this.closest('tr');
-        var qty = parseInt(this.value) || 0;
-        var price = parseInt(row.querySelector('.cart-price').dataset.price) || 0;
-        row.querySelector('.cart-sum').textContent = (price * qty).toLocaleString() + '원';
-        updateCartSummary();
-    });
-    $(function() { updateCartSummary(); });
+<section class="dm-cart-page" layout:fragment="content">
+    <div class="container">
+        <div class="dm-page-head">
+            <span class="section-kicker">shopping bag</span>
+            <h1>장바구니</h1>
+            <p>담아둔 상품의 수량과 금액을 확인하고 주문으로 이어가세요.</p>
+        </div>
 
-    // 장바구니 전체 비우기
-    $(document).on('click', '#cart-clear-btn', function() {
-        if (confirm('장바구니를 모두 비우시겠습니까?')) {
+        <div class="dm-cart-empty" th:if="${#lists.isEmpty(cartList)}">
+            <i class="fa fa-shopping-bag" aria-hidden="true"></i>
+            <h2>장바구니가 비어 있습니다</h2>
+            <p>지금 인기 상품을 둘러보고 마음에 드는 상품을 담아보세요.</p>
+            <a class="btn btn-theme" th:href="@{/product/list}">상품 보러가기</a>
+        </div>
+
+        <div class="dm-cart-layout" th:if="${not #lists.isEmpty(cartList)}">
+            <div class="dm-cart-items">
+                <article class="dm-cart-item" th:each="item : ${cartList}">
+                    <a class="dm-cart-thumb" th:href="@{/product/detail(productSeq=${item['productSeq']})}">
+                        <img th:src="@{${item['imageUrl']}}" onerror="this.src='/images/preparing.png'" alt="상품 이미지">
+                    </a>
+                    <div class="dm-cart-info">
+                        <a class="dm-cart-title" th:href="@{/product/detail(productSeq=${item['productSeq']})}" th:text="${item['productName']}">상품명</a>
+                        <span class="dm-cart-meta">무료배송 가능 · 교환/반품 안내 확인</span>
+                        <strong class="dm-cart-price" th:data-price="${item['price']}" th:text="${#numbers.formatInteger(item['price'], 0, 'COMMA')} + '원'">0원</strong>
+                    </div>
+                    <div class="dm-cart-control">
+                        <label>수량</label>
+                        <div class="dm-cart-stepper">
+                            <button type="button" class="cart-qty-minus" aria-label="수량 줄이기">-</button>
+                            <input type="number" min="1" name="quantity" th:value="${item['quantity']}" class="cart-qty-input"
+                                   th:data-cart-seq="${item['cartSeq']}" th:data-product-seq="${item['productSeq']}">
+                            <button type="button" class="cart-qty-plus" aria-label="수량 늘리기">+</button>
+                        </div>
+                        <button class="dm-text-danger cart-delete-btn" th:data-cart-seq="${item['cartSeq']}" th:data-product-seq="${item['productSeq']}">삭제</button>
+                    </div>
+                    <div class="dm-cart-line-total">
+                        <span>상품금액</span>
+                        <strong class="cart-sum" th:text="${#numbers.formatInteger(item['price'] * item['quantity'], 0, 'COMMA')} + '원'">0원</strong>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="dm-order-summary">
+                <h2>주문 예상 금액</h2>
+                <dl>
+                    <div>
+                        <dt>상품 수</dt>
+                        <dd><span id="cart-total-count">0</span>개</dd>
+                    </div>
+                    <div>
+                        <dt>상품 금액</dt>
+                        <dd><span id="cart-total-price">0</span>원</dd>
+                    </div>
+                    <div>
+                        <dt>배송비</dt>
+                        <dd id="cart-shipping-price">0원</dd>
+                    </div>
+                    <div class="dm-summary-total">
+                        <dt>결제 예정</dt>
+                        <dd><span id="cart-pay-price">0</span>원</dd>
+                    </div>
+                </dl>
+                <button type="button" class="btn btn-theme dm-checkout-btn" id="cart-order-btn">전체 상품 주문하기</button>
+                <button type="button" class="btn btn-line dm-clear-btn" id="cart-clear-btn">장바구니 비우기</button>
+                <p>주문 전 재고와 배송 가능 여부가 다시 확인됩니다.</p>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        function formatWon(value) {
+            return (parseInt(value, 10) || 0).toLocaleString();
+        }
+
+        function normalizeQty(input) {
+            input.value = Math.max(parseInt(input.value, 10) || 1, 1);
+            return parseInt(input.value, 10);
+        }
+
+        function updateCartSummary() {
+            var totalCount = 0;
+            var productTotal = 0;
+            document.querySelectorAll('.cart-qty-input').forEach(function(input) {
+                var row = input.closest('.dm-cart-item');
+                var qty = normalizeQty(input);
+                var price = parseInt(row.querySelector('.dm-cart-price').dataset.price, 10) || 0;
+                totalCount += qty;
+                productTotal += qty * price;
+                row.querySelector('.cart-sum').textContent = formatWon(qty * price) + '원';
+            });
+            var shipping = productTotal >= 50000 || productTotal === 0 ? 0 : 3000;
+            document.getElementById('cart-total-count').textContent = totalCount;
+            document.getElementById('cart-total-price').textContent = formatWon(productTotal);
+            document.getElementById('cart-shipping-price').textContent = shipping === 0 ? '무료' : formatWon(shipping) + '원';
+            document.getElementById('cart-pay-price').textContent = formatWon(productTotal + shipping);
+        }
+
+        function persistQty(input) {
+            $.ajax({
+                url: '/cart/update',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ cartSeq: input.dataset.cartSeq, quantity: normalizeQty(input) }),
+                success: function(res) {
+                    if(!res.success) alert('수량 변경 실패: ' + (res.message || '서버 오류'));
+                },
+                error: function(xhr) {
+                    var message = xhr.responseJSON && xhr.responseJSON.message;
+                    alert(message === 'LOGIN_REQUIRED' ? '로그인이 필요합니다.' : '수량 변경 실패');
+                    if (xhr.status === 401 || message === 'LOGIN_REQUIRED') window.location.href = '/login';
+                }
+            });
+        }
+
+        $(function() { updateCartSummary(); });
+
+        $(document).on('click', '.cart-qty-minus, .cart-qty-plus', function() {
+            var input = this.parentElement.querySelector('.cart-qty-input');
+            var next = normalizeQty(input) + (this.classList.contains('cart-qty-plus') ? 1 : -1);
+            input.value = Math.max(next, 1);
+            updateCartSummary();
+            persistQty(input);
+        });
+
+        $(document).on('change', '.cart-qty-input', function() {
+            updateCartSummary();
+            persistQty(this);
+        });
+
+        $(document).on('click', '#cart-clear-btn', function() {
+            if (!confirm('장바구니를 모두 비우시겠습니까?')) return;
             $.ajax({
                 url: '/cart/clear',
                 type: 'POST',
                 contentType: 'application/json',
                 data: '{}',
                 success: function(res) {
-                    if(res.success) location.reload();
-                    else alert('장바구니 비우기 실패: ' + (res.message || '서버 오류'));
+                    if(res > 0 || res.success) location.reload();
+                    else alert('비울 장바구니가 없습니다.');
                 },
-                error: function(xhr) {
-                    alert('장바구니 비우기 실패: ' + (xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : '서버 오류'));
-                }
+                error: function() { alert('장바구니 비우기 실패'); }
             });
-        }
-    });
-    // 장바구니 전체 구매
-    $(document).on('click', '#cart-order-btn', function() {
-        var items = [];
-        var totalPrice = 0;
-        document.querySelectorAll('.cart-qty-input').forEach(function(input) {
-            var row = input.closest('tr');
-            var productSeq = row.querySelector('.cart-delete-btn').dataset.productSeq;
-            var productName = row.querySelector('a').textContent; // 상품명 추가
-            var qty = parseInt(input.value) || 0;
-            var price = parseInt(row.querySelector('.cart-price').dataset.price) || 0;
-            items.push({ productSeq: productSeq, productName: productName, quantity: qty, price: price });
-            totalPrice += qty * price;
         });
-        if(items.length === 0) {
-            alert('장바구니가 비어있습니다.');
-            return;
-        }
-        $.ajax({
-            url: '/order/create',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ totalPrice: totalPrice, items: items }),
-            success: function(res) {
-                if(res.success) {
-                    alert('주문이 완료되었습니다.');
-                    location.reload();
-                } else {
-                    alert('주문 실패: ' + (res.message || '서버 오류'));
-                }
-            },
-            error: function(xhr) {
-                alert('주문 실패: ' + (xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : '서버 오류'));
-            }
+
+        $(document).on('click', '.cart-delete-btn', function() {
+            $.ajax({
+                url: '/cart/delete',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ cartSeq: this.dataset.cartSeq }),
+                success: function(res) {
+                    if(res.success) location.reload();
+                    else alert('삭제 실패: ' + (res.message || '서버 오류'));
+                },
+                error: function() { alert('삭제 실패'); }
+            });
         });
-    });
-    // 장바구니 삭제
-    $(document).on('click', '.cart-delete-btn', function() {
-        var cartSeq = this.dataset.cartSeq;
-        $.ajax({
-            url: '/cart/delete',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ cartSeq: cartSeq }),
-            success: function(res) {
-                if(res.success) location.reload();
-                else alert('삭제 실패: ' + (res.message || '서버 오류'));
-            },
-            error: function(xhr) {
-                alert('삭제 실패: ' + (xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : '서버 오류'));
-            }
+
+        $(document).on('click', '#cart-order-btn', function() {
+            alert('주문서 화면으로 이동합니다.');
+            window.location.href = '/order';
         });
-    });
-    // 장바구니 수량 변경
-    $(document).on('change', '.cart-qty-input', function() {
-        var cartSeq = this.dataset.cartSeq;
-        var qty = parseInt(this.value) || 0;
-        $.ajax({
-            url: '/cart/update',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ cartSeq: cartSeq, quantity: qty }),
-            success: function(res) {
-                if(!res.success) alert('수량 변경 실패: ' + (res.message || '서버 오류'));
-            },
-            error: function(xhr) {
-                alert('수량 변경 실패: ' + (xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : '서버 오류'));
-            }
-        });
-    });
     </script>
-</div>
+</section>
 </body>
 </html>

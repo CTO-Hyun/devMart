@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,10 +17,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 @Service
 public class UserService implements UserDetailsService {
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserMapper userMapper) {
+    public UserService(UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // 회원가입 처리
@@ -31,7 +32,7 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("이미 존재하는 아이디입니다.");
         }
         String rawPw = (String) params.get("password");
-        String encPw = new BCryptPasswordEncoder().encode(rawPw);
+        String encPw = passwordEncoder.encode(rawPw);
         params.put("password", encPw);
         params.put("email", params.get("email"));
         userMapper.insertUser(params);
@@ -52,7 +53,7 @@ public class UserService implements UserDetailsService {
         // 비밀번호 암호화 처리
         if (params.containsKey("password")) {
             String rawPw = (String) params.get("password");
-            String encPw = new BCryptPasswordEncoder().encode(rawPw);
+            String encPw = passwordEncoder.encode(rawPw);
             params.put("password", encPw);
         }
         userMapper.insertUser(params);
@@ -85,7 +86,15 @@ public class UserService implements UserDetailsService {
         Long userSeq = user.get("userSeq") != null ? Long.parseLong(user.get("userSeq").toString()) : null;
         String password = (String) user.get("password");
         String role = (String) user.get("role");
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-        return new CustomUserDetails(userSeq, username, password, authorities);
+        String status = (String) user.get("status");
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(toSpringRole(role)));
+        return new CustomUserDetails(userSeq, username, password, authorities, status);
+    }
+
+    private String toSpringRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "ROLE_USER";
+        }
+        return role.startsWith("ROLE_") ? role : "ROLE_" + role;
     }
 }

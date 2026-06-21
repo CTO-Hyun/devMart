@@ -1,9 +1,12 @@
 package kr.co.devMart.controller;
 
 import kr.co.devMart.service.CartService;
+import kr.co.devMart.common.auth.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,28 +30,38 @@ public class CartController {
     }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public List<Map<String, Object>> getCartList() {
+    public ResponseEntity<?> getCartList() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userId = auth.getName();
+        Long userSeq = currentUserSeq(auth);
+        if (userSeq == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "LOGIN_REQUIRED"));
+        }
         Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
-        return cartService.getCartListByUser(params);
+        params.put("userSeq", userSeq);
+        return ResponseEntity.ok(cartService.getCartListByUser(params));
     }
 
     @PostMapping("/add")
     @ResponseBody
-    public Map<String, Object> addCart(@RequestBody Map<String, Object> params) {
+    public ResponseEntity<Map<String, Object>> addCart(@RequestBody Map<String, Object> params) {
         Map<String, Object> res = new HashMap<>();
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            params.put("userId", auth.getName());
+            Long userSeq = currentUserSeq(auth);
+            if (userSeq == null) {
+                res.put("success", false);
+                res.put("message", "LOGIN_REQUIRED");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+            }
+            params.put("userSeq", userSeq);
             int result = cartService.addCart(params);
             res.put("success", result > 0);
         } catch (Exception e) {
             res.put("success", false);
             res.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         }
-        return res;
+        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/update")
@@ -56,6 +69,14 @@ public class CartController {
     public Map<String, Object> updateCartQuantity(@RequestBody Map<String, Object> params) {
         Map<String, Object> res = new HashMap<>();
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Long userSeq = currentUserSeq(auth);
+            if (userSeq == null) {
+                res.put("success", false);
+                res.put("message", "LOGIN_REQUIRED");
+                return res;
+            }
+            params.put("userSeq", userSeq);
             int result = cartService.updateCartQuantity(params);
             res.put("success", result > 0);
         } catch (Exception e) {
@@ -71,6 +92,14 @@ public class CartController {
     public Map<String, Object> deleteCart(@RequestBody Map<String, Object> params) {
         Map<String, Object> res = new HashMap<>();
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Long userSeq = currentUserSeq(auth);
+            if (userSeq == null) {
+                res.put("success", false);
+                res.put("message", "LOGIN_REQUIRED");
+                return res;
+            }
+            params.put("userSeq", userSeq);
             int result = cartService.deleteCart(params);
             res.put("success", result > 0);
         } catch (Exception e) {
@@ -83,11 +112,24 @@ public class CartController {
     @RequestMapping(value = "/clear", method = RequestMethod.POST)
     public int clearCart() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userId = auth.getName();
+        Long userSeq = currentUserSeq(auth);
+        if (userSeq == null) {
+            return 0;
+        }
         Map<String, Object> params = new HashMap<>();
-        params.put("userId", userId);
+        params.put("userSeq", userSeq);
         int deleted = cartService.deleteCartByUser(params);
-        System.out.println("[CartController] clearCart: userId=" + userId + ", deletedRows=" + deleted);
         return deleted;
+    }
+
+    private Long currentUserSeq(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return null;
+        }
+        Object principal = auth.getPrincipal();
+        if (principal instanceof CustomUserDetails userDetails) {
+            return userDetails.getUserSeq();
+        }
+        return null;
     }
 }

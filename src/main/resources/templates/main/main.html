@@ -1,867 +1,117 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.w3.org/1999/xhtml"
       layout:decorate="~{layout/default}">
-<!--<html lang="en-US">-->
 <head>
-
     <meta charset="UTF-8">
-    <title>포트포리오</title>
+    <title>devMart | curated commerce</title>
 </head>
-
 <body>
-
-
-<section class="content" layout:fragment="content">
-
-<div class="slider">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 col-sm-8">
-                <div class="slider big-slider">
-                    <div id="featured" class="carousel slide" data-ride="carousel">
-
-                        <!-- Indicators -->
-                        <ol class="carousel-indicators">
-                            <li data-target="#featured" data-slide-to="0" class="active"></li>
-                        </ol>
-
-                        <!-- Wrapper for slides -->
-                        <div class="carousel-inner" role="listbox">
-                            <div class="item active" style="background-image:url('/images/slider-1.jpg')">
-                                <div class="carousel-caption">
-                                    <h4>Save up to 30%</h4>
-                                    <h2 class="raleway">New collection <span>2016</span></h2>
-                                    <a href="" class="btn btn-theme">Shop Now</a>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+<section class="dm-home" layout:fragment="content">
+    <section class="dm-hero">
+        <div class="container dm-hero-grid">
+            <a class="dm-hero-main" th:href="@{/product/list(sort='popular')}" style="background-image:url('/images/clothes/women-5.jpg')">
+                <div>
+                    <span class="section-kicker">weekly best</span>
+                    <h1>지금 가장 많이 담긴 데일리 컬렉션</h1>
+                    <p>5,000개 이상의 상품을 카테고리, 가격, 평점 기준으로 빠르게 비교하세요.</p>
+                    <span class="dm-hero-cta">인기 상품 보기</span>
                 </div>
-            </div>
-
-            <div class="col-md-4 col-sm-4">
-                <div class="slider small-slider">
-                    <div id="small-featured" class="carousel slide" data-ride="carousel">
-                        <!-- Indicators -->
-                        <ol class="carousel-indicators">
-                            <li data-target="#small-featured" data-slide-to="0" class="active"></li>
-                        </ol>
-                        <!-- Wrapper for slides -->
-                        <div class="carousel-inner" role="listbox">
-                            <div class="item active" style="background-image:url('/images/etc/etc-2.jpg')">
-                                <div class="carousel-caption">
-                                    <h3>Kids Fashion</h3>
-                                    <p>Save up to 50%</p>
-                                    <a href="" class="btn btn-theme">Shop Now</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<div class="banner">
-    <div class="container">
-        <div class="row">
-
-            <div class="col-md-4 col-sm-4">
-                <div class="single-banner" style="background-image:url(/images/bag/bag-1.jpg)">
-                    <div class="banner-caption">
-                        <h3>Awesome Bag Collection</h3>
-                        <a href="" class="btn btn-theme">Shop Now</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 col-sm-4">
-                <div class="single-banner" style="background-image:url(/images/clothes/men-2.jpg)">
-                    <div class="banner-caption">
-                        <h3>Men Shirt Collection</h3>
-                        <a href="" class="btn btn-theme">Shop Now</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4 col-sm-4">
-                <div class="single-banner" style="background-image:url(/images/bag/bag-2.jpg)">
-                    <div class="banner-caption">
-                        <h3>Women Bag Collection</h3>
-                        <a href="" class="btn btn-theme">Shop Now</a>
-                    </div>
-                </div>
+            </a>
+            <div class="dm-hero-side">
+                <a th:href="@{/product/list(categoryType='SHOES')}" style="background-image:url('/images/shoes/shoes-7.jpg')">
+                    <span>슈즈 특가</span>
+                    <strong>최대 30%</strong>
+                </a>
+                <a th:href="@{/product/list(categoryType='BAG')}" style="background-image:url('/images/bag/bag-4.jpg')">
+                    <span>가방 신상</span>
+                    <strong>오늘 출고</strong>
+                </a>
             </div>
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="shopping-process text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3 col-sm-3">
-                <div class="single-process">
-                    <i class="fa fa-check"></i>
-                    <h3>Choose a Product</h3>
-                    <p>The European languages are members the same family. Their separate existence science </p>
+    <section class="dm-benefit-strip">
+        <div class="container">
+            <div><i class="fa fa-truck"></i><strong>빠른 출고</strong><span>평일 오후 주문 당일 처리</span></div>
+            <div><i class="fa fa-refresh"></i><strong>쉬운 교환</strong><span>상품별 교환/반품 안내 제공</span></div>
+            <div><i class="fa fa-star"></i><strong>리뷰 기반</strong><span>구매자 리뷰와 문의 확인</span></div>
+            <div><i class="fa fa-lock"></i><strong>안전 주문</strong><span>로그인 사용자 장바구니 보호</span></div>
+        </div>
+    </section>
+
+    <section class="dm-section">
+        <div class="container">
+            <div class="dm-section-head">
+                <div>
+                    <span class="section-kicker">category</span>
+                    <h2>카테고리 바로가기</h2>
                 </div>
+                <a th:href="@{/product/list}">전체 상품 보기</a>
             </div>
-
-            <div class="col-md-3 col-sm-3">
-                <div class="single-process">
-                    <i class="fa fa-cart-arrow-down"></i>
-                    <h3>Add to Cart</h3>
-                    <p>The European languages are members the same family. Their separate existence science </p>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-sm-3">
-                <div class="single-process">
-                    <i class="fa fa-money"></i>
-                    <h3>Make Order</h3>
-                    <p>The European languages are members the same family. Their separate existence science </p>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-sm-3">
-                <div class="single-process">
-                    <i class="fa fa-dashcube"></i>
-                    <h3>Deliver For Free</h3>
-                    <p>The European languages are members the same family. Their separate existence science </p>
-                </div>
+            <div class="dm-category-grid">
+                <a th:href="@{/product/list(categoryType='WOMEN')}" style="background-image:url('/images/clothes/women-1.jpg')"><span>여성</span></a>
+                <a th:href="@{/product/list(categoryType='MEN')}" style="background-image:url('/images/clothes/men-4.jpg')"><span>남성</span></a>
+                <a th:href="@{/product/list(categoryType='SHOES')}" style="background-image:url('/images/shoes/shoes-3.jpg')"><span>신발</span></a>
+                <a th:href="@{/product/list(categoryType='BAG')}" style="background-image:url('/images/bag/bag-1.jpg')"><span>가방</span></a>
+                <a th:href="@{/product/list(categoryType='SPORTS')}" style="background-image:url('/images/sports/sports-1.jpg')"><span>스포츠</span></a>
+                <a th:href="@{/product/list(categoryType='ACC')}" style="background-image:url('/images/acc/acc-1.jpg')"><span>잡화</span></a>
             </div>
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="featured-items">
-    <div class="container">
-        <div class="row">
-            <ul class="nav nav-tabs nav-product-tabs">
-                <li class="active"><a href="#trending" data-toggle="tab">Trending Items</a></li>
-                <li><a href="#best-seller" data-toggle="tab">Best Seller</a></li>
-                <li class="pull-right collection-url"><a href="">View All <i class="fa fa-long-arrow-right"></i></a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane active" id="trending">
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-1.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href="single-product.html"><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-2.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href="single-product.html"><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-3.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href="single-product.html"><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-4.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/kids-1.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/kids-2.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/kids-3.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/kids-4.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-pane fade" id="best-seller">
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-6.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/men-4.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/men-5.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/men-6.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-8.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-6.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-
-                                <img src="/images/clothes/women-7.jpg" alt="" class="thumbnail">
-
-                                <div class="product-description text-center">
-
-                                    <p class="title">Date Tiffany Torchiere</p>
-
-                                    <p class="price">$ 55.00</p>
-
-                                </div>
-
-                                <div class="product-hover">
-
-                                    <ul>
-
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-
-                                    </ul>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-3 col-sm-4">
-
-                        <div class="single-product">
-
-                            <div class="product-block">
-
-                                <img src="/images/clothes/women-5.jpg" alt="" class="thumbnail">
-
-                                <div class="product-description text-center">
-
-                                    <p class="title">Date Tiffany Torchiere</p>
-
-                                    <p class="price">$ 55.00</p>
-
-                                </div>
-
-                                <div class="product-hover">
-
-                                    <ul>
-
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-
-                                    </ul>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
+    <section class="dm-section dm-editorial-section">
+        <div class="container dm-editorial-grid">
+            <div>
+                <span class="section-kicker">curation</span>
+                <h2>구매 전환을 높이는 쇼핑 흐름</h2>
+                <p>상품 탐색부터 상세 확인, 장바구니 수량 변경, 리뷰와 문의 작성까지 실제 커머스 서비스의 핵심 흐름을 갖췄습니다.</p>
+                <a class="btn btn-theme" th:href="@{/product/list}">상품 탐색 시작</a>
             </div>
-
-        </div>
-
-    </div>
-
-</div>
-<div class="popular-items">
-    <div class="container">
-        <div class="row">
-            <ul class="nav nav-tabs nav-product-tabs">
-                <li class="active"><a href="#popular" data-toggle="tab">Popular</a></li>
-                <li><a href="#special" data-toggle="tab">Special</a></li>
-                <li class="pull-right collection-url"><a href="">View All <i class="fa fa-long-arrow-right"></i></a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane active" id="popular">
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-5.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-7.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-6.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-8.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/men-6.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/men-5.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/men-4.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-6.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="special">
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/kids-4.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/kids-3.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/kids-2.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/kids-1.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-4.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-3.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-2.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-4">
-                        <div class="single-product">
-                            <div class="product-block">
-                                <img src="/images/clothes/women-1.jpg" alt="" class="thumbnail">
-                                <div class="product-description text-center">
-                                    <p class="title">Date Tiffany Torchiere</p>
-                                    <p class="price">$ 55.00</p>
-                                </div>
-                                <div class="product-hover">
-                                    <ul>
-                                        <li><a href=""><i class="fa fa-cart-arrow-down"></i></a></li>
-                                        <li><a href=""><i class="fa fa-arrows-h"></i></a></li>
-                                        <li><a href=""><i class="fa fa-heart-o"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="dm-feature-list">
+                <article><strong>01</strong><span>40개 단위 페이지네이션과 정렬 유지</span></article>
+                <article><strong>02</strong><span>로그인 사용자 기준 장바구니 저장</span></article>
+                <article><strong>03</strong><span>리뷰·문의 작성과 수정/삭제 UX</span></article>
             </div>
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="blog">
-    <div class="container">
-        <div class="row">
-            <div class="blog-title">
-                <h2 class="pull-left text-left">From The Blog</h2>
-                <a href="" class="pull-right text-right">More Post <i class="fa fa-long-arrow-right"></i></a>
-            </div>
-            <div class="clearfix"></div>
-            <div class="col-md-4 col-sm-4">
-                <div class="single-post">
-                    <div class="post-inner">
-                        <div class="post-thumbnail">
-                            <img src="/images/post-1.jpg" alt="">
-                            <div class="date">31<br> Jun</div>
-                            <a href="" class="read-more raleway">Read More <i class="fa fa-long-arrow-right"></i>
-                            </a>
-                        </div>
-                        <h4 class="post-title">Party Night Dresses Available Delivery Let's Start</h4>
-                    </div>
+    <section class="dm-section">
+        <div class="container">
+            <div class="dm-section-head">
+                <div>
+                    <span class="section-kicker">popular</span>
+                    <h2>지금 많이 찾는 상품</h2>
                 </div>
+                <a th:href="@{/product/list(sort='popular')}">인기순 보기</a>
             </div>
-            <div class="col-md-4 col-sm-4">
-                <div class="single-post">
-                    <div class="post-inner">
-                        <div class="post-thumbnail">
-                            <img src="/images/post-2.jpg" alt="">
-                            <div class="date">31<br> Jun</div>
-                            <a href="" class="read-more raleway">Read More <i class="fa fa-long-arrow-right"></i>
-                            </a>
-                        </div>
-                        <h4 class="post-title">At the early beginnings of the Web written content</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 col-sm-4">
-                <div class="single-post">
-                    <div class="post-inner">
-                        <div class="post-thumbnail">
-                            <img src="/images/etc/etc-1.jpg" alt="">
-                            <div class="date">31<br> Jun</div>
-                            <a href="" class="read-more raleway">Read More <i class="fa fa-long-arrow-right"></i>
-                            </a>
-                        </div>
-                        <h4 class="post-title">Let’s start with the most essential part of any written content</h4>
-                    </div>
-                </div>
+            <div class="dm-home-products">
+                <a th:href="@{/product/list(categoryType='WOMEN')}" class="dm-promo-card">
+                    <img src="/images/clothes/women-3.jpg" alt="여성 데일리 니트">
+                    <span>BEST</span>
+                    <strong>데일리 니트 컬렉션</strong>
+                    <em>55,000원대</em>
+                </a>
+                <a th:href="@{/product/list(categoryType='MEN')}" class="dm-promo-card">
+                    <img src="/images/clothes/men-2.jpg" alt="남성 셔츠">
+                    <span>NEW</span>
+                    <strong>남성 베이직 셔츠</strong>
+                    <em>49,000원대</em>
+                </a>
+                <a th:href="@{/product/list(categoryType='SHOES')}" class="dm-promo-card">
+                    <img src="/images/shoes/shoes-5.jpg" alt="스니커즈">
+                    <span>SALE</span>
+                    <strong>캐주얼 스니커즈</strong>
+                    <em>69,000원대</em>
+                </a>
+                <a th:href="@{/product/list(categoryType='BAG')}" class="dm-promo-card">
+                    <img src="/images/bag/bag-2.jpg" alt="크로스백">
+                    <span>PICK</span>
+                    <strong>미니 크로스백</strong>
+                    <em>39,000원대</em>
+                </a>
             </div>
         </div>
-    </div>
-</div>
+    </section>
 </section>
 </body>
 </html>

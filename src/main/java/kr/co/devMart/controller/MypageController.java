@@ -1,6 +1,7 @@
 package kr.co.devMart.controller;
 
 import kr.co.devMart.service.CartService;
+import kr.co.devMart.common.auth.CustomUserDetails;
 import kr.co.devMart.service.OrderService;
 import kr.co.devMart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,11 @@ public class MypageController {
     public List<Map<String, Object>> getCartList() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> params = new HashMap<>();
-        params.put("username", auth.getName());
+        Long userSeq = null;
+        if (auth != null && auth.getPrincipal() instanceof CustomUserDetails userDetails) {
+            userSeq = userDetails.getUserSeq();
+        }
+        params.put("userSeq", userSeq);
         return cartService.getCartListByUser(params);
     }
 

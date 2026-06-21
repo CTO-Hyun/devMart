@@ -10,12 +10,14 @@ public class CustomUserDetails implements UserDetails {
     private final String username;
     private final String password;
     private final List<GrantedAuthority> authorities;
+    private final String status;
 
-    public CustomUserDetails(Long userSeq, String username, String password, List<GrantedAuthority> authorities) {
+    public CustomUserDetails(Long userSeq, String username, String password, List<GrantedAuthority> authorities, String status) {
         this.userSeq = userSeq;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
+        this.status = status;
     }
     public Long getUserSeq() { return userSeq; }
     @Override public String getUsername() { return username; }
@@ -24,5 +26,5 @@ public class CustomUserDetails implements UserDetails {
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    @Override public boolean isEnabled() { return "ACTIVE".equalsIgnoreCase(status); }
 }

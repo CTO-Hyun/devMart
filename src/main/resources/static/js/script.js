@@ -45,37 +45,21 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ productSeq: productSeq, quantity: 1 }),
-                success: function() {
-                    // 장바구니 정보 새로고침
+                success: function(result) {
+                    if (!result || result.success !== true) {
+                        alert(result && result.message === 'LOGIN_REQUIRED' ? '로그인 후 장바구니를 이용할 수 있습니다.' : '장바구니 담기 실패');
+                        if (result && result.message === 'LOGIN_REQUIRED') window.location.href = '/login';
+                        return;
+                    }
                     updateCartSummary();
                 },
                 error: function(xhr) {
-                    alert('장바구니 담기 실패: ' + (xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : '로그인 필요 또는 서버 오류'));
+                    var message = xhr.responseJSON && xhr.responseJSON.message;
+                    alert(message === 'LOGIN_REQUIRED' ? '로그인 후 장바구니를 이용할 수 있습니다.' : '장바구니 담기 실패');
+                    if (xhr.status === 401 || message === 'LOGIN_REQUIRED') window.location.href = '/login';
                 }
             });
         });
-
-        // 장바구니 개수/금액 요약 정보 갱신
-        function updateCartSummary() {
-            $.ajax({
-                url: '/cart/list',
-                type: 'GET',
-                success: function(cartList) {
-                    var totalCount = 0;
-                    var totalPrice = 0;
-                    for (var i = 0; i < cartList.length; i++) {
-                        var qty = parseInt(cartList[i].quantity) || 0;
-                        var price = parseInt(cartList[i].price) || 0;
-                        totalCount += qty;
-                        totalPrice += price * qty;
-                    }
-                    $(".cart-text").html('장바구니<br>' + totalCount + ' 건 - ' + totalPrice.toLocaleString() + '원');
-                },
-                error: function() {
-                    $(".cart-text").html('장바구니<br>0 건 - 0원');
-                }
-            });
-        }
 
         // 페이지 로드 시 장바구니 정보 갱신
         updateCartSummary();
@@ -91,3 +75,45 @@
 
 
 }(jQuery));
+
+function updateCartSummary() {
+    $.ajax({
+        url: '/cart/list',
+        type: 'GET',
+        success: function(cartList) {
+            if (!Array.isArray(cartList)) {
+                $(".cart-text").html('장바구니<br>0 건 - 0원');
+                return;
+            }
+            var totalCount = 0;
+            var totalPrice = 0;
+            for (var i = 0; i < cartList.length; i++) {
+                var qty = parseInt(cartList[i].quantity) || 0;
+                var price = parseInt(cartList[i].price) || 0;
+                totalCount += qty;
+                totalPrice += price * qty;
+            }
+            $(".cart-text").html('장바구니<br>' + totalCount + ' 건 - ' + totalPrice.toLocaleString() + '원');
+        },
+        error: function() {
+            $(".cart-text").html('장바구니<br>0 건 - 0원');
+        }
+    });
+}
+
+function showCartToast(message) {
+    var $toast = $('.dm-cart-toast');
+    if (!$toast.length) {
+        $toast = $('<div class="dm-cart-toast" role="status" aria-live="polite">'
+            + '<div><strong></strong><span>상품 수량은 장바구니에서 변경할 수 있습니다.</span></div>'
+            + '<a href="/cart.html">장바구니 보기</a>'
+            + '</div>');
+        $('body').append($toast);
+    }
+    $toast.find('strong').text(message || '장바구니에 담았습니다.');
+    $toast.addClass('is-visible');
+    clearTimeout(window.__dmCartToastTimer);
+    window.__dmCartToastTimer = setTimeout(function () {
+        $toast.removeClass('is-visible');
+    }, 2600);
+}
